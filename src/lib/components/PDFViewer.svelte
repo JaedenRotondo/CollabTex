@@ -13,13 +13,14 @@
 	let scale = 1.5;
 	let numPages = 0;
 	let pdfjsLib: any;
+	let dpiScale = 4; // Always use maximum quality (4x) rendering
 
 	// Load PDF.js only on client side
 	onMount(async () => {
 		if (browser) {
 			pdfjsLib = await import('pdfjs-dist');
-			// Configure PDF.js worker
-			pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+			// Configure PDF.js worker - use local copy to avoid CORS
+			pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 			
 			// If pdfData is already available, load it
 			if (pdfData) {
@@ -49,12 +50,20 @@
 
 		try {
 			const page = await pdfDoc.getPage(num);
-			const viewport = page.getViewport({ scale });
+			
+			// Get device pixel ratio for high DPI displays and apply additional DPI scaling
+			const outputScale = (window.devicePixelRatio || 1) * dpiScale;
+			
+			const viewport = page.getViewport({ scale: scale * outputScale });
 
 			// Set canvas dimensions
 			const context = canvas.getContext('2d');
 			canvas.height = viewport.height;
 			canvas.width = viewport.width;
+			
+			// Set CSS size to maintain proper display size
+			canvas.style.width = Math.floor(viewport.width / outputScale) + 'px';
+			canvas.style.height = Math.floor(viewport.height / outputScale) + 'px';
 
 			// Render PDF page
 			const renderContext = {
