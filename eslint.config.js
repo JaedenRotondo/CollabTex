@@ -17,6 +17,9 @@ export default ts.config(
 	prettier,
 	...svelte.configs.prettier,
 	{
+		ignores: ['**/pdf.worker.min.js', '**/node_modules/**', '**/dist/**', '**/build/**']
+	},
+	{
 		languageOptions: {
 			globals: { ...globals.browser, ...globals.node }
 		},

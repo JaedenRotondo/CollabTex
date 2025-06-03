@@ -8,25 +8,30 @@
 	import Toolbar from '$lib/components/Toolbar.svelte';
 	import FileExplorer from '$lib/components/FileExplorer.svelte';
 	import UserPresence from '$lib/components/UserPresence.svelte';
-	import { initializeCollaboration } from '$lib/collaboration/yjs-setup';
+	import { initializeCollaboration, type FileNode } from '$lib/collaboration/yjs-setup';
+	import type { FileSync } from '$lib/collaboration/file-sync';
 
 	let ydoc: Y.Doc | undefined;
 	let provider: WebrtcProvider | undefined;
+	let files: Y.Map<FileNode> | undefined;
+	let activeFile: Y.Map<{ id: string }> | undefined;
+	let fileSync: FileSync | undefined;
 	let roomId = $page.params.roomId;
 	let showFileExplorer = true;
 	let splitPosition = 50;
 	let pdfData: ArrayBuffer | null = null;
-	let initialized = false;
 
 	onMount(() => {
 		console.log('Initializing collaboration for room:', roomId);
-		
+
 		try {
 			const collab = initializeCollaboration(roomId);
 			ydoc = collab.ydoc;
 			provider = collab.provider;
-			initialized = true;
-			
+			files = collab.files;
+			activeFile = collab.activeFile;
+			fileSync = collab.fileSync;
+
 			console.log('Collaboration initialized successfully');
 		} catch (error) {
 			console.error('Failed to initialize collaboration:', error);
@@ -36,11 +41,17 @@
 			console.log('Cleaning up collaboration');
 			provider?.destroy();
 			ydoc?.destroy();
+			fileSync?.destroy();
 		};
 	});
 
 	function handleCompile(event: CustomEvent<{ pdf: ArrayBuffer }>) {
 		pdfData = event.detail.pdf;
+	}
+
+	function handleFileSelect() {
+		// File selection is handled by the FileExplorer component
+		// The active file is automatically synced via Yjs
 	}
 
 	function handleSplitDrag(event: MouseEvent) {
@@ -64,18 +75,28 @@
 
 {#if ydoc && provider}
 	<div class="bg-overleaf-editor flex h-screen flex-col">
-		<Toolbar on:compile={handleCompile} {ydoc} />
+		{#if activeFile}
+			<Toolbar on:compile={handleCompile} {ydoc} {activeFile} />
+		{/if}
 
 		<div class="flex flex-1 overflow-hidden">
 			{#if showFileExplorer}
 				<div class="border-border bg-overleaf-sidebar w-64 border-r">
-					<FileExplorer />
+					{#if files && activeFile}
+						<FileExplorer {files} {activeFile} on:fileSelect={handleFileSelect} />
+					{:else}
+						<div class="flex h-full items-center justify-center">
+							<p class="text-sm text-gray-500">Loading files...</p>
+						</div>
+					{/if}
 				</div>
 			{/if}
 
 			<div class="relative flex flex-1">
 				<div class="relative" style="width: {splitPosition}%">
-					<Editor {ydoc} {provider} />
+					{#if files && activeFile}
+						<Editor {ydoc} {provider} {files} {activeFile} />
+					{/if}
 				</div>
 
 				<button
@@ -98,9 +119,11 @@
 {:else}
 	<div class="flex h-screen items-center justify-center">
 		<div class="text-center">
-			<div class="mb-4 inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-			<p class="text-lg text-muted-foreground">Initializing editor...</p>
-			<p class="text-sm text-muted-foreground mt-2">Room ID: {roomId}</p>
+			<div
+				class="border-primary mb-4 inline-block h-12 w-12 animate-spin rounded-full border-b-2"
+			></div>
+			<p class="text-muted-foreground text-lg">Initializing editor...</p>
+			<p class="text-muted-foreground mt-2 text-sm">Room ID: {roomId}</p>
 		</div>
 	</div>
 {/if}

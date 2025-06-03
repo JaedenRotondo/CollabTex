@@ -15,6 +15,32 @@ export const session = sqliteTable('session', {
 	expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull()
 });
 
-export type Session = typeof session.$inferSelect;
+export const project = sqliteTable('project', {
+	id: text('id').primaryKey(),
+	roomId: text('room_id').notNull().unique(),
+	name: text('name').notNull(),
+	ownerId: text('owner_id')
+		.notNull()
+		.references(() => user.id),
+	createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+	updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull()
+});
 
+export const file = sqliteTable('file', {
+	id: text('id').primaryKey(),
+	projectId: text('project_id')
+		.notNull()
+		.references(() => project.id),
+	name: text('name').notNull(),
+	path: text('path').notNull(),
+	type: text('type', { enum: ['file', 'folder'] }).notNull(),
+	content: text('content'),
+	parentId: text('parent_id'),
+	createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+	updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull()
+});
+
+export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;
+export type Project = typeof project.$inferSelect;
+export type File = typeof file.$inferSelect;

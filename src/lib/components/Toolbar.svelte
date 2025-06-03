@@ -6,6 +6,7 @@
 	import type * as Y from 'yjs';
 
 	export let ydoc: Y.Doc;
+	export let activeFile: Y.Map<{ id: string }>;
 
 	const dispatch = createEventDispatcher();
 	let compiling = false;
@@ -20,7 +21,19 @@
 
 		compiling = true;
 		try {
-			const content = ydoc.getText('latex-content').toString();
+			let content = '';
+
+			// Get content from active file
+			const activeData = activeFile?.get('id');
+			const activeFileId = typeof activeData === 'object' && activeData?.id ? activeData.id : null;
+			if (activeFileId) {
+				const ytext = ydoc.getText(`file-${activeFileId}`);
+				content = ytext.toString();
+			} else {
+				// Fallback to legacy content
+				content = ydoc.getText('latex-content').toString();
+			}
+
 			const result = await compileLatex(content);
 
 			if (result.pdf) {

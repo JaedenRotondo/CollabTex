@@ -2,17 +2,27 @@
 	import { afterUpdate, onMount } from 'svelte';
 	import { browser } from '$app/environment';
 
+	interface PDFPageProxy {
+		getViewport(params: { scale: number }): { width: number; height: number };
+		render(params: {
+			canvasContext: CanvasRenderingContext2D;
+			viewport: { width: number; height: number };
+			transform?: number[];
+		}): { promise: Promise<void> };
+		getTextContent(): Promise<{ items: Array<{ str: string; transform: number[] }> }>;
+	}
+
 	export let pdfData: ArrayBuffer | null = null;
 
 	let canvas: HTMLCanvasElement;
 	let textLayer: HTMLDivElement;
-	let pdfDoc: any = null;
+	let pdfDoc: unknown | null = null;
 	let pageNum = 1;
 	let pageRendering = false;
 	let pageNumPending: number | null = null;
 	let scale = 1.5;
 	let numPages = 0;
-	let pdfjsLib: any;
+	let pdfjsLib: typeof import('pdfjs-dist') | undefined;
 	let dpiScale = 4; // Always use maximum quality (4x) rendering
 
 	// Load PDF.js only on client side
@@ -21,7 +31,7 @@
 			pdfjsLib = await import('pdfjs-dist');
 			// Configure PDF.js worker - use local copy to avoid CORS
 			pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
-			
+
 			// If pdfData is already available, load it
 			if (pdfData) {
 				loadPdf(pdfData);
@@ -31,11 +41,11 @@
 
 	async function loadPdf(data: ArrayBuffer) {
 		if (!pdfjsLib) return;
-		
+
 		try {
 			const loadingTask = pdfjsLib.getDocument({ data });
 			pdfDoc = await loadingTask.promise;
-			numPages = pdfDoc.numPages;
+			numPages = (pdfDoc as { numPages?: number })?.numPages || 0;
 			pageNum = 1;
 			renderPage(pageNum);
 		} catch (error) {
@@ -50,17 +60,17 @@
 
 		try {
 			const page = await pdfDoc.getPage(num);
-			
+
 			// Get device pixel ratio for high DPI displays and apply additional DPI scaling
 			const outputScale = (window.devicePixelRatio || 1) * dpiScale;
-			
+
 			const viewport = page.getViewport({ scale: scale * outputScale });
 
 			// Set canvas dimensions
 			const context = canvas.getContext('2d');
 			canvas.height = viewport.height;
 			canvas.width = viewport.width;
-			
+
 			// Set CSS size to maintain proper display size
 			canvas.style.width = Math.floor(viewport.width / outputScale) + 'px';
 			canvas.style.height = Math.floor(viewport.height / outputScale) + 'px';
@@ -71,7 +81,8 @@
 				viewport: viewport
 			};
 
-			await page.render(renderContext).promise;
+			await (page as PDFPageProxy).render(renderContext as Parameters<PDFPageProxy['render']>[0])
+				.promise;
 
 			// Render text layer for selection
 			// For now, we'll skip text layer rendering to avoid direct DOM manipulation
