@@ -91,6 +91,23 @@
 		shareModalOpen = true;
 	}
 
+	async function handleImport(event: CustomEvent<{ message: string; filesImported: number }>) {
+		console.log('Import successful:', event.detail);
+		
+		// Refresh the file sync to load imported files from database
+		if (fileSync) {
+			await fileSync.loadFromDB();
+		}
+		
+		// Show success message (you could add a toast notification here)
+		alert(`Successfully imported ${event.detail.filesImported} files!`);
+	}
+
+	function handleImportError(event: CustomEvent<{ error: string }>) {
+		console.error('Import failed:', event.detail.error);
+		alert(`Import failed: ${event.detail.error}`);
+	}
+
 
 	function handleFileSelect() {
 		// File selection is handled by the FileExplorer component
@@ -123,6 +140,8 @@
 				on:compile={handleCompile}
 				on:toggleErrors={handleToggleErrors}
 				on:share={handleShare}
+				on:import={handleImport}
+				on:importError={handleImportError}
 				{ydoc}
 				{activeFile}
 			/>
@@ -132,7 +151,12 @@
 			{#if showFileExplorer}
 				<div class="border-border bg-overleaf-sidebar w-64 border-r">
 					{#if files && activeFile}
-						<FileExplorer {files} {activeFile} on:fileSelect={handleFileSelect} />
+						<FileExplorer 
+							{files} 
+							{activeFile} 
+							on:fileSelect={handleFileSelect}
+							on:import={() => document.getElementById('toolbar-import')?.click()} 
+						/>
 					{:else}
 						<div class="flex h-full items-center justify-center">
 							<p class="text-sm text-gray-500">Loading files...</p>

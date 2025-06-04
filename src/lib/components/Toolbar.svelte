@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { compileLatex, type CompileError } from '$lib/latex/compiler';
 	import type * as Y from 'yjs';
-	import { AlertCircle, CheckCircle, Share2 } from 'lucide-svelte';
+	import { AlertCircle, CheckCircle, Share2, Upload } from 'lucide-svelte';
 
 	export let ydoc: Y.Doc;
 	export let activeFile: Y.Map<{ id: string }>;
@@ -14,6 +14,8 @@
 	let shareUrl = '';
 	let lastCompileStatus: 'success' | 'error' | null = null;
 	let errorCount = 0;
+	let importing = false;
+	let fileInput: HTMLInputElement;
 
 	$: if ($page.params.roomId) {
 		shareUrl = `${$page.url.origin}/editor/${$page.params.roomId}`;
@@ -84,6 +86,59 @@
 	function handleShare() {
 		dispatch('share');
 	}
+
+	function handleImport() {
+		fileInput?.click();
+	}
+
+	async function handleFileUpload(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const files = target.files;
+		
+		if (!files || files.length === 0) return;
+
+		importing = true;
+		try {
+			const formData = new FormData();
+			
+			// Add all files to form data
+			Array.from(files).forEach(file => {
+				formData.append('files', file);
+			});
+			
+			// Add project name (optional)
+			formData.append('projectName', 'Imported Project');
+
+			const response = await fetch(`/api/projects/${$page.params.roomId}/import`, {
+				method: 'POST',
+				body: formData
+			});
+
+			const result = await response.json();
+
+			if (result.success) {
+				// Refresh the project to load imported files
+				dispatch('import', {
+					message: result.message,
+					filesImported: result.filesImported
+				});
+			} else {
+				console.error('Import failed:', result.error);
+				dispatch('importError', {
+					error: result.error
+				});
+			}
+		} catch (error) {
+			console.error('Import failed:', error);
+			dispatch('importError', {
+				error: error instanceof Error ? error.message : 'Import failed'
+			});
+		} finally {
+			importing = false;
+			// Reset input
+			target.value = '';
+		}
+	}
 </script>
 
 <div class="bg-overleaf-toolbar flex items-center justify-between border-b px-4 py-2">
@@ -119,6 +174,22 @@
 		{/if}
 
 		<Button variant="outline" size="sm" on:click={handleDownload}>Download PDF</Button>
+		
+		<Button 
+			variant="outline" 
+			size="sm" 
+			on:click={handleImport}
+			disabled={importing}
+			id="toolbar-import"
+		>
+			{#if importing}
+				<span class="mr-2 animate-spin">⟳</span>
+				Importing...
+			{:else}
+				<Upload size={16} class="mr-1" />
+				Import
+			{/if}
+		</Button>
 	</div>
 
 	<div class="flex items-center gap-4">
@@ -130,3 +201,14 @@
 		</Button>
 	</div>
 </div>
+
+<!-- Hidden file input for import -->
+<input
+	bind:this={fileInput}
+	type="file"
+	multiple
+	webkitdirectory
+	accept=".tex,.bib,.cls,.sty,.txt,.md"
+	on:change={handleFileUpload}
+	style="display: none;"
+/>

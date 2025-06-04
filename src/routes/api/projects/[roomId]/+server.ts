@@ -175,11 +175,17 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 
-		// Delete all files for this project first
-		await db.delete(file).where(eq(file.projectId, projectData.id));
+		// Delete all related records in a transaction
+		await db.transaction(async (tx) => {
+			// 1. Delete all files for this project
+			await tx.delete(file).where(eq(file.projectId, projectData.id));
+			
+			// 2. Delete all shares for this project
+			await tx.delete(projectShare).where(eq(projectShare.projectId, projectData.id));
 
-		// Delete the project
-		await db.delete(project).where(eq(project.id, projectData.id));
+			// 3. Delete the project
+			await tx.delete(project).where(eq(project.id, projectData.id));
+		});
 
 		return json({ success: true });
 	} catch (error) {

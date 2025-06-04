@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
+	import { Upload } from 'lucide-svelte';
 
 	let roomId = '';
+	let importing = false;
+	let fileInput: HTMLInputElement;
 
 	function createNewRoom() {
 		const newRoomId = generateRoomId();
@@ -25,6 +28,61 @@
 			Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
 		);
 	}
+
+	function handleImport() {
+		fileInput?.click();
+	}
+
+	async function handleFileUpload(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const files = target.files;
+		
+		if (!files || files.length === 0) return;
+
+		importing = true;
+		try {
+			// Create a new room for the imported project
+			const newRoomId = generateRoomId();
+			
+			const formData = new FormData();
+			
+			// Add all files to form data
+			Array.from(files).forEach(file => {
+				formData.append('files', file);
+			});
+			
+			// Add project name based on folder name or use "Imported Project"
+			const firstFile = files[0] as any;
+			const folderName = firstFile.webkitRelativePath?.split('/')[0] || 'Imported Project';
+			formData.append('projectName', folderName);
+
+			const response = await fetch(`/api/projects/${newRoomId}/import`, {
+				method: 'POST',
+				body: formData
+			});
+
+			const result = await response.json();
+
+			if (result.success) {
+				// Navigate to the new project
+				goto(`/editor/${newRoomId}`);
+			} else {
+				console.error('Import failed:', result.error);
+				if (result.error === 'Authentication required') {
+					alert('Please log in to import projects. You can import projects after creating an account.');
+				} else {
+					alert(`Import failed: ${result.error}`);
+				}
+			}
+		} catch (error) {
+			console.error('Import failed:', error);
+			alert('Import failed. Please try again.');
+		} finally {
+			importing = false;
+			// Reset input
+			target.value = '';
+		}
+	}
 </script>
 
 <div
@@ -39,13 +97,31 @@
 		<div class="space-y-6 rounded-lg bg-white p-6 shadow-lg">
 			<div>
 				<h2 class="mb-4 text-xl font-semibold">Start a new document</h2>
-				<Button
-					on:click={createNewRoom}
-					size="lg"
-					class="bg-overleaf-green hover:bg-overleaf-green/90 w-full"
-				>
-					Create New Room
-				</Button>
+				<div class="space-y-3">
+					<Button
+						on:click={createNewRoom}
+						size="lg"
+						class="bg-overleaf-green hover:bg-overleaf-green/90 w-full"
+					>
+						Create New Room
+					</Button>
+					
+					<Button
+						on:click={handleImport}
+						size="lg"
+						variant="outline"
+						class="w-full"
+						disabled={importing}
+					>
+						{#if importing}
+							<span class="mr-2 animate-spin">⟳</span>
+							Importing...
+						{:else}
+							<Upload size={20} class="mr-2" />
+							Import Project
+						{/if}
+					</Button>
+				</div>
 			</div>
 
 			<div class="relative">
@@ -94,3 +170,14 @@
 		</div>
 	</div>
 </div>
+
+<!-- Hidden file input for import -->
+<input
+	bind:this={fileInput}
+	type="file"
+	multiple
+	webkitdirectory
+	accept=".tex,.bib,.cls,.sty,.txt,.md"
+	on:change={handleFileUpload}
+	style="display: none;"
+/>

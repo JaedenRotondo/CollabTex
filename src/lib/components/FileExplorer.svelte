@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import type * as Y from 'yjs';
-	import { Plus, FolderPlus } from 'lucide-svelte';
+	import { Plus, FolderPlus, Upload } from 'lucide-svelte';
 	import type { FileNode } from '$lib/collaboration/yjs-setup';
 	import FileTreeNode from './FileTreeNode.svelte';
 
@@ -200,6 +200,13 @@
 	<div class="flex items-center justify-between border-b p-4">
 		<h3 class="text-sm font-semibold">Files</h3>
 		<div class="flex gap-1">
+			<button
+				on:click={() => dispatch('import')}
+				class="rounded p-1 hover:bg-gray-200"
+				title="Import files"
+			>
+				<Upload size={16} />
+			</button>
 			<button
 				on:click={() => handleShowNewItemDialog('folder')}
 				class="rounded p-1 hover:bg-gray-200"
