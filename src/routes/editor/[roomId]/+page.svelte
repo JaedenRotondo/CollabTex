@@ -9,6 +9,7 @@
 	import FileExplorer from '$lib/components/FileExplorer.svelte';
 	import UserPresence from '$lib/components/UserPresence.svelte';
 	import CompileErrors from '$lib/components/CompileErrors.svelte';
+	import ShareModal from '$lib/components/ShareModal.svelte';
 	import { initializeCollaboration, type FileNode } from '$lib/collaboration/yjs-setup';
 	import type { FileSync } from '$lib/collaboration/file-sync';
 	import type { CompileError } from '$lib/latex/compiler';
@@ -25,6 +26,8 @@
 	let pdfData: ArrayBuffer | null = null;
 	let compileErrors: CompileError[] = [];
 	let showErrors = false;
+	let shareModalOpen = false;
+	let projectName = 'Untitled Project';
 
 	onMount(() => {
 		console.log('Initializing collaboration for room:', roomId);
@@ -48,6 +51,19 @@
 			console.error('Failed to initialize collaboration:', error);
 		}
 
+		// Fetch project name asynchronously
+		(async () => {
+			try {
+				const response = await fetch(`/api/projects/${roomId}`);
+				if (response.ok) {
+					const data = await response.json();
+					projectName = data.project?.name || 'Untitled Project';
+				}
+			} catch (error) {
+				console.error('Failed to fetch project details:', error);
+			}
+		})();
+
 		return () => {
 			console.log('Cleaning up collaboration');
 			provider?.destroy();
@@ -70,6 +86,11 @@
 	function handleToggleErrors() {
 		showErrors = !showErrors;
 	}
+
+	function handleShare() {
+		shareModalOpen = true;
+	}
+
 
 	function handleFileSelect() {
 		// File selection is handled by the FileExplorer component
@@ -101,6 +122,7 @@
 			<Toolbar
 				on:compile={handleCompile}
 				on:toggleErrors={handleToggleErrors}
+				on:share={handleShare}
 				{ydoc}
 				{activeFile}
 			/>
@@ -159,6 +181,13 @@
 		</div>
 	</div>
 {/if}
+
+<ShareModal
+	bind:isOpen={shareModalOpen}
+	{projectName}
+	{roomId}
+	on:close={() => shareModalOpen = false}
+/>
 
 <style>
 	:global(body) {

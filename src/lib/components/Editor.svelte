@@ -31,6 +31,10 @@
 					if (fileId) {
 						console.log('Active file changed to:', fileId);
 						loadFile(fileId);
+						// If editor not initialized yet, try to initialize it now
+						if (!view && ydoc && provider && editorContainer) {
+							initializeEditor();
+						}
 					} else {
 						console.log('No active file');
 						currentFileId = null;
@@ -55,6 +59,16 @@
 		initializeEditor();
 	}
 
+	// Watch for activeFile changes
+	$: if (activeFile && ydoc && provider && view) {
+		const activeData = activeFile.get('id');
+		const fileId = typeof activeData === 'object' && activeData?.id ? activeData.id : null;
+		if (fileId && fileId !== currentFileId) {
+			loadFile(fileId);
+			updateEditorContent();
+		}
+	}
+
 	function loadFile(fileId: string) {
 		console.log('Loading file:', fileId);
 		const file = files.get(fileId);
@@ -68,11 +82,8 @@
 		// Get or create a Y.Text for this file
 		ytext = ydoc.getText(`file-${fileId}`);
 
-		// Initialize content if empty
-		if (ytext.length === 0 && file.content !== undefined) {
-			console.log('Initializing file content');
-			ytext.insert(0, file.content);
-		}
+		// Content should already be initialized by file-sync.ts
+		// Don't insert content here to avoid duplication
 
 		// Update editor with new text
 		if (view) {
@@ -145,12 +156,20 @@
 		if (fileId) {
 			loadFile(fileId);
 		} else {
-			// Fallback to legacy content
-			ytext = ydoc.getText('latex-content');
+			console.warn('No active file set, retrying in 500ms...');
+			// Retry after a delay in case the activeFile is being set asynchronously
+			setTimeout(() => {
+				if (!view) initializeEditor();
+			}, 500);
+			return;
 		}
 
 		if (!ytext) {
-			console.warn('No text to edit');
+			console.warn('No text to edit, retrying in 200ms...');
+			// Retry in case ytext is being set up
+			setTimeout(() => {
+				if (!view) initializeEditor();
+			}, 200);
 			return;
 		}
 

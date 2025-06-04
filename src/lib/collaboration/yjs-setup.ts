@@ -19,6 +19,7 @@ export interface CollaborationInstance {
 	files: Y.Map<FileNode>;
 	activeFile: Y.Map<{ id: string }>;
 	fileSync: FileSync;
+	createDefaultContent: () => void;
 }
 
 export function initializeCollaboration(roomId: string): CollaborationInstance {
@@ -32,41 +33,6 @@ export function initializeCollaboration(roomId: string): CollaborationInstance {
 	// Initialize file system
 	const files = ydoc.getMap<FileNode>('files');
 	const activeFile = ydoc.getMap<{ id: string }>('activeFile');
-
-	// Initialize default file if files are empty
-	if (files.size === 0) {
-		const mainFileId = 'main-tex';
-		const defaultContent = `\\documentclass{article}
-\\usepackage{graphicx}
-\\usepackage{amsmath}
-
-\\title{Your Document Title}
-\\author{Your Name}
-\\date{\\today}
-
-\\begin{document}
-
-\\maketitle
-
-\\section{Introduction}
-Start writing your LaTeX document here...
-
-\\end{document}`;
-
-		files.set(mainFileId, {
-			id: mainFileId,
-			name: 'main.tex',
-			type: 'file',
-			parentId: null,
-			content: defaultContent
-		});
-
-		// Set as active file
-		activeFile.set('id', { id: mainFileId });
-
-		// Also set the ytext content
-		ytext.insert(0, defaultContent);
-	}
 
 	console.log('Creating WebRTC provider...');
 
@@ -92,8 +58,48 @@ Start writing your LaTeX document here...
 	// IndexedDB persistence for offline support
 	const persistence = new IndexeddbPersistence(roomId, ydoc);
 
+	// Function to create default content when needed
+	const createDefaultContent = () => {
+		if (files.size === 0) {
+			const mainFileId = 'main-tex';
+			const defaultContent = `\\documentclass{article}
+\\usepackage{graphicx}
+\\usepackage{amsmath}
+
+\\title{Your Document Title}
+\\author{Your Name}
+\\date{\\today}
+
+\\begin{document}
+
+\\maketitle
+
+\\section{Introduction}
+Start writing your LaTeX document here...
+
+\\end{document}`;
+
+			files.set(mainFileId, {
+				id: mainFileId,
+				name: 'main.tex',
+				type: 'file',
+				parentId: null,
+				content: defaultContent
+			});
+
+			// Set as active file
+			activeFile.set('id', { id: mainFileId });
+
+			// Initialize the Y.Text content for this file
+			const fileYText = ydoc.getText(`file-${mainFileId}`);
+			if (fileYText.length === 0) {
+				fileYText.insert(0, defaultContent);
+			}
+		}
+	};
+
 	// File synchronization with database
-	const fileSync = new FileSync(files, roomId);
+	const fileSync = new FileSync(files, roomId, ydoc, createDefaultContent);
 
 	// Load files from database if user is authenticated
 	if (typeof window !== 'undefined') {
@@ -109,7 +115,8 @@ Start writing your LaTeX document here...
 		awareness: provider.awareness,
 		files,
 		activeFile,
-		fileSync
+		fileSync,
+		createDefaultContent
 	};
 }
 

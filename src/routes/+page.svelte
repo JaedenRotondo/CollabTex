@@ -16,6 +16,11 @@
 	}
 
 	function generateRoomId(): string {
+		// Use crypto.randomUUID for better security
+		if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+			return crypto.randomUUID();
+		}
+		// Fallback for older browsers
 		return (
 			Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
 		);
@@ -77,6 +82,15 @@
 		<div class="mt-8 text-center text-sm text-gray-600">
 			<p>Powered by YJS for real-time collaboration</p>
 			<p class="mt-2">LaTeX compilation happens entirely in your browser</p>
+		</div>
+
+		<div class="mt-6 text-center">
+			<p class="text-sm text-gray-600">
+				Want to save your projects?
+				<a href="/demo/lucia/login" class="text-overleaf-green hover:underline font-medium">
+					Login / Register
+				</a>
+			</p>
 		</div>
 	</div>
 </div>

@@ -1,15 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db';
-import { project, file } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { project, file, projectShare } from '$lib/server/db/schema';
+import { eq, and, or, isNull } from 'drizzle-orm';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	const { roomId } = params;
-
-	if (!locals.user) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
-	}
 
 	try {
 		// Get project
@@ -20,6 +16,46 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		}
 
 		const projectData = projects[0];
+
+		// Check if user has access (owner or shared with)
+		if (locals.user) {
+			const isOwner = projectData.ownerId === locals.user.id;
+			
+			if (!isOwner) {
+				// Check if project is shared with this user
+				const shares = await db
+					.select()
+					.from(projectShare)
+					.where(
+						and(
+							eq(projectShare.projectId, projectData.id),
+							or(
+								eq(projectShare.sharedWithUserId, locals.user.id),
+								isNull(projectShare.sharedWithUserId) // public share
+							)
+						)
+					);
+
+				if (shares.length === 0) {
+					return json({ error: 'Access denied' }, { status: 403 });
+				}
+			}
+		} else {
+			// Anonymous user - check if project has public sharing
+			const publicShares = await db
+				.select()
+				.from(projectShare)
+				.where(
+					and(
+						eq(projectShare.projectId, projectData.id),
+						isNull(projectShare.sharedWithUserId)
+					)
+				);
+
+			if (publicShares.length === 0) {
+				return json({ error: 'Unauthorized' }, { status: 401 });
+			}
+		}
 
 		// Get all files for this project
 		const files = await db.select().from(file).where(eq(file.projectId, projectData.id));
@@ -113,6 +149,41 @@ Start writing your LaTeX document here...
 		});
 	} catch (error) {
 		console.error('Error creating project:', error);
+		return json({ error: 'Internal server error' }, { status: 500 });
+	}
+};
+
+export const DELETE: RequestHandler = async ({ params, locals }) => {
+	const { roomId } = params;
+
+	if (!locals.user) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	try {
+		// Get project to verify ownership
+		const projects = await db.select().from(project).where(eq(project.roomId, roomId));
+
+		if (projects.length === 0) {
+			return json({ error: 'Project not found' }, { status: 404 });
+		}
+
+		const projectData = projects[0];
+
+		// Check if user owns the project
+		if (projectData.ownerId !== locals.user.id) {
+			return json({ error: 'Forbidden' }, { status: 403 });
+		}
+
+		// Delete all files for this project first
+		await db.delete(file).where(eq(file.projectId, projectData.id));
+
+		// Delete the project
+		await db.delete(project).where(eq(project.id, projectData.id));
+
+		return json({ success: true });
+	} catch (error) {
+		console.error('Error deleting project:', error);
 		return json({ error: 'Internal server error' }, { status: 500 });
 	}
 };

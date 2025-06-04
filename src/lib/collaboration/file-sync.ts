@@ -1,15 +1,19 @@
-import type * as Y from 'yjs';
+import * as Y from 'yjs';
 import type { FileNode } from './yjs-setup';
 
 export class FileSync {
 	private files: Y.Map<FileNode>;
 	private roomId: string;
+	private ydoc: Y.Doc;
+	private createDefaultContent: () => void;
 	private syncInterval: number | null = null;
 	private pendingChanges: Set<string> = new Set();
 
-	constructor(files: Y.Map<FileNode>, roomId: string) {
+	constructor(files: Y.Map<FileNode>, roomId: string, ydoc: Y.Doc, createDefaultContent: () => void) {
 		this.files = files;
 		this.roomId = roomId;
+		this.ydoc = ydoc;
+		this.createDefaultContent = createDefaultContent;
 		this.setupObservers();
 	}
 
@@ -101,8 +105,18 @@ export class FileSync {
 			const response = await fetch(`/api/projects/${this.roomId}`);
 			if (!response.ok) {
 				if (response.status === 404) {
-					// Project doesn't exist, create it
-					await this.createProject();
+					// Project doesn't exist in DB, check if we're authenticated
+					const authCheck = await fetch('/api/projects');
+					if (authCheck.ok) {
+						// User is authenticated, create project in DB
+						await this.createProject();
+					} else {
+						// User is not authenticated, create default content
+						this.createDefaultContent();
+					}
+				} else if (response.status === 401) {
+					// User is not authenticated, create default content
+					this.createDefaultContent();
 				} else {
 					throw new Error('Failed to load project');
 				}
@@ -111,7 +125,7 @@ export class FileSync {
 
 			const data = await response.json();
 
-			// Clear existing files
+			// Clear existing files and Y.Text documents
 			this.files.clear();
 
 			// Load files from database
@@ -121,11 +135,31 @@ export class FileSync {
 					name: file.name,
 					type: file.type,
 					parentId: file.parentId,
-					content: file.content
+					content: file.content || ''
 				});
+
+				// Initialize Y.Text for this file with database content
+				if (file.type === 'file') {
+					const fileYText = this.ydoc.getText(`file-${file.id}`);
+					if (fileYText.length === 0 && file.content) {
+						fileYText.insert(0, file.content);
+					}
+				}
+			}
+
+			// Set the first file as active if no active file is set
+			const activeFileMap = this.ydoc.getMap('activeFile');
+			if (data.files.length > 0 && !activeFileMap.get('id')) {
+				const firstFile = data.files.find((f: { type: string }) => f.type === 'file');
+				if (firstFile) {
+					activeFileMap.set('id', { id: firstFile.id });
+					console.log('Set active file to:', firstFile.id);
+				}
 			}
 		} catch (error) {
 			console.error('Error loading from database:', error);
+			// If there's an error, create default content
+			this.createDefaultContent();
 		}
 	}
 
@@ -147,6 +181,9 @@ export class FileSync {
 
 			const data = await response.json();
 
+			// Clear existing files
+			this.files.clear();
+
 			// Load the created files
 			for (const file of data.files) {
 				this.files.set(file.id, {
@@ -154,8 +191,24 @@ export class FileSync {
 					name: file.name,
 					type: file.type,
 					parentId: file.parentId,
-					content: file.content
+					content: file.content || ''
 				});
+
+				// Initialize Y.Text for this file with database content
+				if (file.type === 'file') {
+					const fileYText = this.ydoc.getText(`file-${file.id}`);
+					if (fileYText.length === 0 && file.content) {
+						fileYText.insert(0, file.content);
+					}
+				}
+			}
+
+			// Set the first file as active
+			const firstFile = data.files.find((f: { type: string }) => f.type === 'file');
+			if (firstFile) {
+				const activeFileMap = this.ydoc.getMap('activeFile');
+				activeFileMap.set('id', { id: firstFile.id });
+				console.log('Set active file to:', firstFile.id);
 			}
 		} catch (error) {
 			console.error('Error creating project:', error);

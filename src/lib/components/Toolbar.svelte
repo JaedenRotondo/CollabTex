@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { compileLatex, type CompileError } from '$lib/latex/compiler';
 	import type * as Y from 'yjs';
-	import { AlertCircle, CheckCircle } from 'lucide-svelte';
+	import { AlertCircle, CheckCircle, Share2 } from 'lucide-svelte';
 
 	export let ydoc: Y.Doc;
 	export let activeFile: Y.Map<{ id: string }>;
@@ -81,20 +81,8 @@
 		dispatch('download');
 	}
 
-	async function handleShare() {
-		try {
-			await navigator.clipboard.writeText(shareUrl);
-			dispatch('notification', {
-				message: 'Link copied to clipboard!',
-				type: 'success'
-			});
-		} catch (error) {
-			console.error('Failed to copy link:', error);
-			dispatch('notification', {
-				message: 'Failed to copy link',
-				type: 'error'
-			});
-		}
+	function handleShare() {
+		dispatch('share');
 	}
 </script>
 
@@ -136,6 +124,9 @@
 	<div class="flex items-center gap-4">
 		<div class="text-muted-foreground text-sm">CollabTeX Editor</div>
 
-		<Button variant="outline" size="sm" on:click={handleShare}>Share</Button>
+		<Button variant="outline" size="sm" on:click={handleShare}>
+			<Share2 size={16} class="mr-1" />
+			Share
+		</Button>
 	</div>
 </div>
