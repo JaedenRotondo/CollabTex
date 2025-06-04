@@ -24,6 +24,7 @@
 	let numPages = 0;
 	let pdfjsLib: typeof import('pdfjs-dist') | undefined;
 	let dpiScale = 4; // Always use maximum quality (4x) rendering
+	let currentPdfData: ArrayBuffer | null = null; // Track current PDF to detect changes
 
 	// Load PDF.js only on client side
 	onMount(async () => {
@@ -43,7 +44,13 @@
 		if (!pdfjsLib) return;
 
 		try {
-			const loadingTask = pdfjsLib.getDocument({ data });
+			// Destroy existing PDF document if any
+			if (pdfDoc && typeof pdfDoc.destroy === 'function') {
+				await pdfDoc.destroy();
+			}
+			
+			currentPdfData = data;
+			const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(data) });
 			pdfDoc = await loadingTask.promise;
 			numPages = (pdfDoc as { numPages?: number })?.numPages || 0;
 			pageNum = 1;
@@ -68,8 +75,12 @@
 
 			// Set canvas dimensions
 			const context = canvas.getContext('2d');
+			if (!context) return;
+			
+			// Clear the canvas before rendering
 			canvas.height = viewport.height;
 			canvas.width = viewport.width;
+			context.clearRect(0, 0, canvas.width, canvas.height);
 
 			// Set CSS size to maintain proper display size
 			canvas.style.width = Math.floor(viewport.width / outputScale) + 'px';
@@ -137,11 +148,10 @@
 		queueRenderPage(pageNum);
 	}
 
-	afterUpdate(async () => {
-		if (browser && pdfjsLib && pdfData) {
-			loadPdf(pdfData);
-		}
-	});
+	// Watch for pdfData changes
+	$: if (browser && pdfjsLib && pdfData && pdfData !== currentPdfData) {
+		loadPdf(pdfData);
+	}
 </script>
 
 <div class="flex h-full flex-col bg-gray-100">

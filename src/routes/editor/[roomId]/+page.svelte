@@ -8,8 +8,11 @@
 	import Toolbar from '$lib/components/Toolbar.svelte';
 	import FileExplorer from '$lib/components/FileExplorer.svelte';
 	import UserPresence from '$lib/components/UserPresence.svelte';
+	import CompileErrors from '$lib/components/CompileErrors.svelte';
 	import { initializeCollaboration, type FileNode } from '$lib/collaboration/yjs-setup';
 	import type { FileSync } from '$lib/collaboration/file-sync';
+	import type { CompileError } from '$lib/latex/compiler';
+	import { configureCompiler } from '$lib/latex/compiler';
 
 	let ydoc: Y.Doc | undefined;
 	let provider: WebrtcProvider | undefined;
@@ -20,9 +23,17 @@
 	let showFileExplorer = true;
 	let splitPosition = 50;
 	let pdfData: ArrayBuffer | null = null;
+	let compileErrors: CompileError[] = [];
+	let showErrors = false;
 
 	onMount(() => {
 		console.log('Initializing collaboration for room:', roomId);
+
+		// Configure compiler to use server compilation
+		configureCompiler({
+			useServer: true,
+			serverUrl: 'https://latex-server-q7ci.onrender.com'
+		});
 
 		try {
 			const collab = initializeCollaboration(roomId);
@@ -45,8 +56,19 @@
 		};
 	});
 
-	function handleCompile(event: CustomEvent<{ pdf: ArrayBuffer }>) {
-		pdfData = event.detail.pdf;
+	function handleCompile(event: CustomEvent<{ pdf?: ArrayBuffer; errors?: CompileError[] }>) {
+		if (event.detail.pdf) {
+			pdfData = event.detail.pdf;
+			compileErrors = event.detail.errors || [];
+			showErrors = false;
+		} else {
+			compileErrors = event.detail.errors || [];
+			showErrors = true;
+		}
+	}
+
+	function handleToggleErrors() {
+		showErrors = !showErrors;
 	}
 
 	function handleFileSelect() {
@@ -76,7 +98,12 @@
 {#if ydoc && provider}
 	<div class="bg-overleaf-editor flex h-screen flex-col">
 		{#if activeFile}
-			<Toolbar on:compile={handleCompile} {ydoc} {activeFile} />
+			<Toolbar
+				on:compile={handleCompile}
+				on:toggleErrors={handleToggleErrors}
+				{ydoc}
+				{activeFile}
+			/>
 		{/if}
 
 		<div class="flex flex-1 overflow-hidden">
@@ -97,6 +124,11 @@
 					{#if files && activeFile}
 						<Editor {ydoc} {provider} {files} {activeFile} />
 					{/if}
+					<CompileErrors
+						errors={compileErrors}
+						show={showErrors}
+						onClose={() => (showErrors = false)}
+					/>
 				</div>
 
 				<button
