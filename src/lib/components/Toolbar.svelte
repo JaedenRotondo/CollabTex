@@ -234,7 +234,10 @@
 	</div>
 
 	<div class="flex items-center gap-4">
-		<div class="text-academic-gray-600 text-sm font-medium">CollabTeX Editor</div>
+		<div class="flex items-center gap-2">
+			<img src="/collabtex-logo.png" alt="CollabTeX" class="h-6 w-6 rounded" />
+			<span class="text-academic-gray-700 text-sm font-semibold">CollabTeX</span>
+		</div>
 
 		<div class="flex items-center gap-1 border-l border-academic-gray-300 pl-4">
 			<button

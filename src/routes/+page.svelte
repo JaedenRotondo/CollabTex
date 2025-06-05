@@ -128,22 +128,25 @@
 </script>
 
 <div
-	class="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 p-4"
+	class="flex min-h-screen items-center justify-center bg-gradient-to-b from-academic-gray-50 to-academic-gray-100 p-4"
 >
 	<div class="w-full max-w-md">
+		<!-- CollabTeX official logo centered -->
+		<div class="flex justify-center mb-6">
+			<img src="/collabtex-logo.png" alt="CollabTeX" class="h-32 w-32 opacity-90 hover:opacity-100 transition-opacity duration-200 rounded-lg shadow-lg bg-white" />
+		</div>
 		<div class="mb-8 text-center">
-			<h1 class="mb-2 text-4xl font-bold text-gray-900">CollabTeX</h1>
-			<p class="text-lg text-gray-600">Collaborative LaTeX editing in your browser</p>
+			<p class="text-lg text-academic-gray-600">Collaborative LaTeX editing in your browser</p>
 		</div>
 
-		<div class="space-y-6 rounded-lg bg-white p-6 shadow-lg">
+		<div class="space-y-6 rounded-lg bg-academic-paper border border-academic-border p-6 shadow-lg">
 			<div>
-				<h2 class="mb-4 text-xl font-semibold">Start a new document</h2>
+				<h2 class="mb-4 text-xl font-semibold text-academic-gray-800">Start a new document</h2>
 				<div class="space-y-3">
 					<Button
 						on:click={createNewRoom}
 						size="lg"
-						class="bg-overleaf-green hover:bg-overleaf-green/90 w-full"
+						class="bg-academic-primary hover:bg-academic-primary-dark text-white w-full"
 					>
 						Create New Room
 					</Button>
@@ -196,18 +199,18 @@
 					<div class="w-full border-t border-gray-300"></div>
 				</div>
 				<div class="relative flex justify-center text-sm">
-					<span class="bg-white px-2 text-gray-500">Or</span>
+					<span class="bg-academic-paper px-2 text-academic-gray-500">Or</span>
 				</div>
 			</div>
 
 			<div>
-				<h2 class="mb-4 text-xl font-semibold">Join existing room</h2>
+				<h2 class="mb-4 text-xl font-semibold text-academic-gray-800">Join existing room</h2>
 				<form on:submit|preventDefault={joinRoom} class="space-y-4">
 					<input
 						type="text"
 						bind:value={roomId}
 						placeholder="Enter room ID"
-						class="focus:ring-overleaf-green w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2"
+						class="focus:ring-academic-primary w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2"
 					/>
 					<Button
 						type="submit"
@@ -222,15 +225,15 @@
 			</div>
 		</div>
 
-		<div class="mt-8 text-center text-sm text-gray-600">
+		<div class="mt-8 text-center text-sm text-academic-gray-600">
 			<p>Powered by YJS for real-time collaboration</p>
 			<p class="mt-2">LaTeX compilation happens entirely in your browser</p>
 		</div>
 
 		<div class="mt-6 text-center">
-			<p class="text-sm text-gray-600">
+			<p class="text-sm text-academic-gray-600">
 				Want to save your projects?
-				<a href="/demo/lucia/login" class="text-overleaf-green font-medium hover:underline">
+				<a href="/demo/lucia/login" class="text-academic-primary font-medium hover:underline">
 					Login / Register
 				</a>
 			</p>

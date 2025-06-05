@@ -167,6 +167,10 @@
 
 </script>
 
+<svelte:head>
+	<title>CollabTeX - {projectName}</title>
+</svelte:head>
+
 {#if ydoc && provider}
 	<div class="bg-academic-paper flex h-screen flex-col">
 		{#if activeFile}
