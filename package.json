@@ -55,6 +55,7 @@
 		"@codemirror/language": "^6.11.1",
 		"@codemirror/state": "^6.5.2",
 		"@codemirror/view": "^6.37.1",
+		"@lezer/highlight": "^1.2.1",
 		"@libsql/client": "^0.14.0",
 		"@node-rs/argon2": "^2.0.2",
 		"@oslojs/crypto": "^1.0.1",

@@ -2,7 +2,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { EditorView, basicSetup } from 'codemirror';
 	import { EditorState } from '@codemirror/state';
-	import { javascript } from '@codemirror/lang-javascript';
+	import { latex } from '$lib/editor/latex-language';
 	import { autocompletion } from '@codemirror/autocomplete';
 	import { 
 		codeFolding, 
@@ -110,7 +110,7 @@
 			doc: ytext.toString(),
 			extensions: [
 				basicSetup,
-				javascript(), // We'll use JS highlighting for now as LaTeX isn't available
+				latex(), // LaTeX syntax highlighting
 				createTheme(),
 				foldGutterTheme,
 				autocompletion({
@@ -192,7 +192,7 @@
 			doc: ytext.toString(),
 			extensions: [
 				basicSetup,
-				javascript(), // We'll use JS highlighting for now as LaTeX isn't available
+				latex(), // LaTeX syntax highlighting
 				createTheme(),
 				foldGutterTheme,
 				autocompletion({
