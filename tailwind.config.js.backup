@@ -1,0 +1,86 @@
+import typography from '@tailwindcss/typography';
+
+/** @type {import('tailwindcss').Config} */
+export default {
+	content: ['./src/**/*.{html,js,svelte,ts}'],
+	theme: {
+		extend: {
+			colors: {
+				border: 'hsl(var(--border))',
+				input: 'hsl(var(--input))',
+				ring: 'hsl(var(--ring))',
+				background: 'hsl(var(--background))',
+				foreground: 'hsl(var(--foreground))',
+				primary: {
+					DEFAULT: 'hsl(var(--primary))',
+					foreground: 'hsl(var(--primary-foreground))'
+				},
+				secondary: {
+					DEFAULT: 'hsl(var(--secondary))',
+					foreground: 'hsl(var(--secondary-foreground))'
+				},
+				destructive: {
+					DEFAULT: 'hsl(var(--destructive))',
+					foreground: 'hsl(var(--destructive-foreground))'
+				},
+				muted: {
+					DEFAULT: 'hsl(var(--muted))',
+					foreground: 'hsl(var(--muted-foreground))'
+				},
+				accent: {
+					DEFAULT: 'hsl(var(--accent))',
+					foreground: 'hsl(var(--accent-foreground))'
+				},
+				popover: {
+					DEFAULT: 'hsl(var(--popover))',
+					foreground: 'hsl(var(--popover-foreground))'
+				},
+				card: {
+					DEFAULT: 'hsl(var(--card))',
+					foreground: 'hsl(var(--card-foreground))'
+				},
+				// Academic/Overleaf-inspired colors
+				academic: {
+					// Primary greens (sophisticated, scholarly)
+					primary: '#138A36',      // Deep academic green
+					'primary-dark': '#0F6B2A', // Darker green for hover states
+					'primary-light': '#E8F5E8', // Light green for backgrounds
+					
+					// Neutral grays (professional, clean)
+					'gray-50': '#FAFAFA',    // Lightest background
+					'gray-100': '#F5F5F5',   // Sidebar background
+					'gray-200': '#EEEEEE',   // Border color
+					'gray-300': '#E0E0E0',   // Divider lines
+					'gray-400': '#BDBDBD',   // Muted text
+					'gray-500': '#757575',   // Secondary text
+					'gray-600': '#616161',   // Primary text
+					'gray-700': '#424242',   // Dark text
+					'gray-800': '#2C2C2C',   // Header text
+					'gray-900': '#1A1A1A',   // Darkest text
+					
+					// Status colors (academic-themed)
+					success: '#2E7D32',      // Forest green for success
+					warning: '#E65100',      // Academic orange for warnings
+					error: '#C62828',        // Deep red for errors
+					info: '#1565C0',         // Academic blue for info
+					
+					// Editor specific
+					editor: '#FFFFFF',       // Pure white editor background
+					sidebar: '#F8F9FA',      // Warm gray sidebar
+					toolbar: '#F5F6F7',      // Light toolbar background
+					border: '#E1E4E8',       // Soft border color
+					
+					// Paper-like colors
+					paper: '#FFFEF7',        // Warm white like paper
+					'paper-shadow': '#F0F0F0' // Subtle shadow
+				}
+			},
+			borderRadius: {
+				lg: 'var(--radius)',
+				md: 'calc(var(--radius) - 2px)',
+				sm: 'calc(var(--radius) - 4px)'
+			}
+		}
+	},
+	plugins: [typography]
+};

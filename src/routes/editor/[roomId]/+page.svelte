@@ -22,7 +22,6 @@
 	let fileSync: FileSync | undefined;
 	let roomId = $page.params.roomId;
 	let showFileExplorer = true;
-	let splitPosition = 50;
 	let pdfData: ArrayBuffer | null = null;
 	let compileErrors: CompileError[] = [];
 	
@@ -166,27 +165,10 @@
 		// The active file is automatically synced via Yjs
 	}
 
-	function handleSplitDrag(event: MouseEvent) {
-		const startX = event.clientX;
-		const startSplit = splitPosition;
-
-		function handleMouseMove(e: MouseEvent) {
-			const delta = ((e.clientX - startX) / window.innerWidth) * 100;
-			splitPosition = Math.max(20, Math.min(80, startSplit + delta));
-		}
-
-		function handleMouseUp() {
-			window.removeEventListener('mousemove', handleMouseMove);
-			window.removeEventListener('mouseup', handleMouseUp);
-		}
-
-		window.addEventListener('mousemove', handleMouseMove);
-		window.addEventListener('mouseup', handleMouseUp);
-	}
 </script>
 
 {#if ydoc && provider}
-	<div class="bg-overleaf-editor flex h-screen flex-col">
+	<div class="bg-academic-paper flex h-screen flex-col">
 		{#if activeFile}
 			<Toolbar
 				on:compile={handleCompile}
@@ -204,7 +186,7 @@
 
 		<div class="flex flex-1 overflow-hidden">
 			{#if showFileExplorer}
-				<div class="border-border bg-overleaf-sidebar w-64 border-r">
+				<div class="w-64 border-r border-academic-border bg-academic-sidebar shadow-sm">
 					{#if files && activeFile}
 						<FileExplorer
 							{files}
@@ -214,14 +196,14 @@
 						/>
 					{:else}
 						<div class="flex h-full items-center justify-center">
-							<p class="text-sm text-gray-500">Loading files...</p>
+							<p class="text-sm text-academic-gray-500">Loading files...</p>
 						</div>
 					{/if}
 				</div>
 			{/if}
 
-			<div class="relative flex flex-1">
-				<div class="relative" style="width: {splitPosition}%">
+			<div class="flex flex-1">
+				<div class="flex-1 bg-academic-editor">
 					{#if files && activeFile}
 						<Editor bind:this={editorComponent} {ydoc} {provider} {files} {activeFile} />
 					{/if}
@@ -232,14 +214,7 @@
 					/>
 				</div>
 
-				<button
-					class="bg-border hover:bg-primary absolute top-0 bottom-0 z-10 w-1 cursor-col-resize"
-					style="left: {splitPosition}%"
-					on:mousedown={handleSplitDrag}
-					aria-label="Resize panes"
-				></button>
-
-				<div class="flex-1 bg-gray-100">
+				<div class="flex-1 bg-academic-gray-50 shadow-inner">
 					<PDFViewer {pdfData} />
 				</div>
 			</div>

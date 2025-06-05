@@ -42,12 +42,12 @@
 </script>
 
 {#if users.size > 0}
-	<div class="flex items-center gap-2 rounded-lg bg-white px-3 py-2 shadow-lg">
-		<span class="text-sm text-gray-600">Active users:</span>
+	<div class="flex items-center gap-2 rounded-lg bg-academic-paper border border-academic-border px-3 py-2 shadow-lg">
+		<span class="text-sm text-academic-gray-600 font-medium">Active users:</span>
 		<div class="flex -space-x-2">
 			{#each Array.from(users.entries()) as [, user], i (user.name)}
 				<div
-					class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white ring-2 ring-white"
+					class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white ring-2 ring-academic-paper transition-transform duration-200 hover:scale-110"
 					style="background-color: {user.color}; z-index: {users.size - i}"
 					title={user.name}
 				>
@@ -55,7 +55,7 @@
 				</div>
 			{/each}
 		</div>
-		<span class="ml-2 text-sm text-gray-600">
+		<span class="ml-2 text-sm text-academic-gray-600 font-medium">
 			{users.size}
 			{users.size === 1 ? 'user' : 'users'}
 		</span>

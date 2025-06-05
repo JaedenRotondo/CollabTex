@@ -141,24 +141,38 @@
 		return EditorView.theme({
 			'&': {
 				height: '100%',
-				fontSize: '14px'
+				fontSize: '14px',
+				backgroundColor: '#FFFFFF'
 			},
 			'.cm-content': {
-				fontFamily: 'Monaco, Menlo, "Ubuntu Mono", Consolas, monospace',
-				padding: '16px'
+				fontFamily: '"JetBrains Mono", "Fira Code", Monaco, Menlo, "Ubuntu Mono", Consolas, monospace',
+				padding: '20px',
+				lineHeight: '1.6',
+				color: '#2C2C2C'
 			},
 			'.cm-scroller': {
-				fontFamily: 'Monaco, Menlo, "Ubuntu Mono", Consolas, monospace'
+				fontFamily: '"JetBrains Mono", "Fira Code", Monaco, Menlo, "Ubuntu Mono", Consolas, monospace'
 			},
 			'.cm-focused .cm-cursor': {
-				borderLeftColor: '#468847'
+				borderLeftColor: '#138A36'
 			},
 			'.cm-focused .cm-selectionBackground, ::selection': {
-				backgroundColor: '#d7e4f2'
+				backgroundColor: '#E8F5E8'
 			},
 			'.cm-gutters': {
-				backgroundColor: '#f8f8f8',
-				borderRight: '1px solid #ddd'
+				backgroundColor: '#F8F9FA',
+				borderRight: '1px solid #E1E4E8',
+				color: '#757575'
+			},
+			'.cm-lineNumbers .cm-gutterElement': {
+				color: '#BDBDBD',
+				fontSize: '13px'
+			},
+			'.cm-activeLine': {
+				backgroundColor: '#FFFEF7'
+			},
+			'.cm-activeLineGutter': {
+				backgroundColor: '#F5F6F7'
 			}
 		});
 	}

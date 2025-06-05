@@ -12,11 +12,17 @@
 		getTextContent(): Promise<{ items: Array<{ str: string; transform: number[] }> }>;
 	}
 
+	interface PDFDocumentProxy {
+		numPages: number;
+		getPage(pageNumber: number): Promise<PDFPageProxy>;
+		destroy(): Promise<void>;
+	}
+
 	export let pdfData: ArrayBuffer | null = null;
 
 	let canvas: HTMLCanvasElement;
 	let textLayer: HTMLDivElement;
-	let pdfDoc: unknown | null = null;
+	let pdfDoc: PDFDocumentProxy | null = null;
 	let pageNum = 1;
 	let pageRendering = false;
 	let pageNumPending: number | null = null;
@@ -45,16 +51,18 @@
 
 		try {
 			// Destroy existing PDF document if any
-			if (pdfDoc && typeof pdfDoc.destroy === 'function') {
+			if (pdfDoc) {
 				await pdfDoc.destroy();
 			}
 
 			currentPdfData = data;
 			const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(data) });
 			pdfDoc = await loadingTask.promise;
-			numPages = (pdfDoc as { numPages?: number })?.numPages || 0;
+			numPages = pdfDoc.numPages;
 			pageNum = 1;
-			renderPage(pageNum);
+			
+			// Initial render
+			await renderPage(pageNum);
 		} catch (error) {
 			console.error('Error loading PDF:', error);
 		}
@@ -142,9 +150,8 @@
 	}
 
 	function fitToWidth() {
-		if (!canvas.parentElement) return;
-		const containerWidth = canvas.parentElement.clientWidth - 40;
-		scale = containerWidth / canvas.width;
+		// Simple fit to a reasonable default width
+		scale = 1.0;
 		queueRenderPage(pageNum);
 	}
 
@@ -154,24 +161,24 @@
 	}
 </script>
 
-<div class="flex h-full flex-col bg-gray-100">
+<div class="flex h-full flex-col bg-academic-gray-50">
 	{#if pdfData}
-		<div class="flex items-center justify-between border-b bg-white p-2">
-			<div class="flex items-center gap-2">
+		<div class="flex items-center justify-between border-b border-academic-border bg-academic-paper px-4 py-3 shadow-sm">
+			<div class="flex items-center gap-3">
 				<button
 					on:click={onPrevPage}
 					disabled={pageNum <= 1}
-					class="rounded bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+					class="rounded bg-academic-gray-100 px-3 py-1.5 text-sm text-academic-gray-700 hover:bg-academic-gray-200 disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-200"
 				>
 					Previous
 				</button>
-				<span class="text-sm">
+				<span class="text-sm text-academic-gray-600 font-medium">
 					Page {pageNum} of {numPages}
 				</span>
 				<button
 					on:click={onNextPage}
 					disabled={pageNum >= numPages}
-					class="rounded bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+					class="rounded bg-academic-gray-100 px-3 py-1.5 text-sm text-academic-gray-700 hover:bg-academic-gray-200 disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-200"
 				>
 					Next
 				</button>
@@ -180,30 +187,30 @@
 			<div class="flex items-center gap-2">
 				<button
 					on:click={zoomOut}
-					class="rounded bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300"
+					class="rounded bg-academic-gray-100 px-3 py-1.5 text-sm text-academic-gray-700 hover:bg-academic-gray-200 transition-colors duration-200"
 					title="Zoom out"
 				>
-					-
+					−
 				</button>
-				<span class="text-sm">{Math.round(scale * 100)}%</span>
+				<span class="text-sm text-academic-gray-600 font-medium min-w-12 text-center">{Math.round(scale * 100)}%</span>
 				<button
 					on:click={zoomIn}
-					class="rounded bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300"
+					class="rounded bg-academic-gray-100 px-3 py-1.5 text-sm text-academic-gray-700 hover:bg-academic-gray-200 transition-colors duration-200"
 					title="Zoom in"
 				>
 					+
 				</button>
 				<button
 					on:click={fitToWidth}
-					class="rounded bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300"
-					title="Fit to width"
+					class="rounded bg-academic-gray-100 px-3 py-1.5 text-sm text-academic-gray-700 hover:bg-academic-gray-200 transition-colors duration-200"
+					title="Reset zoom to 100%"
 				>
-					Fit
+					Reset
 				</button>
 			</div>
 		</div>
 
-		<div class="flex-1 overflow-auto p-4">
+		<div class="flex-1 overflow-auto p-6 bg-academic-gray-50">
 			<div class="relative mx-auto" style="width: fit-content">
 				<canvas bind:this={canvas} class="shadow-lg"></canvas>
 				<div bind:this={textLayer} class="textLayer absolute top-0 left-0"></div>
