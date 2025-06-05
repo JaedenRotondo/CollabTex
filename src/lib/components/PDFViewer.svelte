@@ -48,7 +48,7 @@
 			if (pdfDoc && typeof pdfDoc.destroy === 'function') {
 				await pdfDoc.destroy();
 			}
-			
+
 			currentPdfData = data;
 			const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(data) });
 			pdfDoc = await loadingTask.promise;
@@ -76,7 +76,7 @@
 			// Set canvas dimensions
 			const context = canvas.getContext('2d');
 			if (!context) return;
-			
+
 			// Clear the canvas before rendering
 			canvas.height = viewport.height;
 			canvas.width = viewport.width;

@@ -9,7 +9,12 @@ export class FileSync {
 	private syncInterval: number | null = null;
 	private pendingChanges: Set<string> = new Set();
 
-	constructor(files: Y.Map<FileNode>, roomId: string, ydoc: Y.Doc, createDefaultContent: () => void) {
+	constructor(
+		files: Y.Map<FileNode>,
+		roomId: string,
+		ydoc: Y.Doc,
+		createDefaultContent: () => void
+	) {
 		this.files = files;
 		this.roomId = roomId;
 		this.ydoc = ydoc;
@@ -147,13 +152,19 @@ export class FileSync {
 				}
 			}
 
-			// Set the first file as active if no active file is set
+			// Set the first file as active if no active file is set, or if current active file doesn't exist
 			const activeFileMap = this.ydoc.getMap('activeFile');
-			if (data.files.length > 0 && !activeFileMap.get('id')) {
+			const currentActiveFile = activeFileMap.get('id');
+			const currentActiveFileId = currentActiveFile && typeof currentActiveFile === 'object' && currentActiveFile.id ? currentActiveFile.id : null;
+			
+			// Check if current active file is valid
+			const isActiveFileValid = currentActiveFileId && data.files.some((f: { id: string; type: string }) => f.id === currentActiveFileId && f.type === 'file');
+			
+			if (data.files.length > 0 && (!currentActiveFileId || !isActiveFileValid)) {
 				const firstFile = data.files.find((f: { type: string }) => f.type === 'file');
 				if (firstFile) {
 					activeFileMap.set('id', { id: firstFile.id });
-					console.log('Set active file to:', firstFile.id);
+					console.log('Set active file to:', firstFile.id, isActiveFileValid ? '(correcting invalid active file)' : '(no active file set)');
 				}
 			}
 		} catch (error) {

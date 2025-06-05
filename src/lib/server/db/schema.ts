@@ -45,8 +45,7 @@ export const projectShare = sqliteTable('project_share', {
 	projectId: text('project_id')
 		.notNull()
 		.references(() => project.id),
-	sharedWithUserId: text('shared_with_user_id')
-		.references(() => user.id), // null means public/anonymous access
+	sharedWithUserId: text('shared_with_user_id').references(() => user.id), // null means public/anonymous access
 	permission: text('permission', { enum: ['view', 'edit'] }).notNull(),
 	sharedBy: text('shared_by')
 		.notNull()

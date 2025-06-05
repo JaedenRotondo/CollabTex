@@ -29,15 +29,18 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 
 		// Validate file types (only text files for LaTeX projects)
 		const allowedExtensions = ['.tex', '.bib', '.cls', '.sty', '.txt', '.md'];
-		const invalidFiles = files.filter(file => {
+		const invalidFiles = files.filter((file) => {
 			const extension = '.' + file.name.split('.').pop()?.toLowerCase();
 			return !allowedExtensions.includes(extension);
 		});
 
 		if (invalidFiles.length > 0) {
-			return json({ 
-				error: `Invalid file types: ${invalidFiles.map(f => f.name).join(', ')}. Only text-based files are supported.` 
-			}, { status: 400 });
+			return json(
+				{
+					error: `Invalid file types: ${invalidFiles.map((f) => f.name).join(', ')}. Only text-based files are supported.`
+				},
+				{ status: 400 }
+			);
 		}
 
 		// Check if project already exists
@@ -52,7 +55,7 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 		if (existingProject.length > 0) {
 			// Use existing project
 			projectId = existingProject[0].id;
-			
+
 			// Verify user owns the project or has edit access
 			if (existingProject[0].ownerId !== user.id) {
 				return json({ error: 'Permission denied' }, { status: 403 });
@@ -86,12 +89,12 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 			createdAt: Date;
 			updatedAt: Date;
 		}> = [];
-		
+
 		for (const uploadedFile of files) {
 			// Extract file path from webkitRelativePath or use just the name
 			const relativePath = (uploadedFile as any).webkitRelativePath || uploadedFile.name;
 			const pathParts = relativePath.split('/');
-			
+
 			// Skip if this is a directory (no content)
 			if (uploadedFile.size === 0 && uploadedFile.type === '') {
 				continue;
@@ -99,44 +102,48 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 
 			// Read file content
 			const content = await uploadedFile.text();
-			
+
 			// Create file record
 			const fileId = crypto.randomUUID();
 			const fileName = pathParts[pathParts.length - 1];
 			const filePath = '/' + relativePath;
-			
+
 			// Determine parent folder if nested
 			let parentId: string | null = null;
 			if (pathParts.length > 1) {
 				// Create parent folders if they don't exist
 				let currentPath = '';
 				let currentParentId: string | null = null;
-				
+
 				for (let i = 0; i < pathParts.length - 1; i++) {
 					currentPath += (currentPath ? '/' : '') + pathParts[i];
 					const folderPath = '/' + currentPath;
-					
+
 					// Check if folder already exists in our records
-					let existingFolder = fileRecords.find(f => f.path === folderPath && f.type === 'folder') as typeof fileRecords[0] | undefined;
-					
+					let existingFolder = fileRecords.find(
+						(f) => f.path === folderPath && f.type === 'folder'
+					) as (typeof fileRecords)[0] | undefined;
+
 					if (!existingFolder) {
 						// Check database for existing folder
 						const dbFolder = await db
 							.select()
 							.from(file)
-							.where(and(
-								eq(file.projectId, projectId),
-								eq(file.path, folderPath),
-								eq(file.type, 'folder')
-							))
+							.where(
+								and(
+									eq(file.projectId, projectId),
+									eq(file.path, folderPath),
+									eq(file.type, 'folder')
+								)
+							)
 							.limit(1);
-						
+
 						if (dbFolder.length > 0) {
 							existingFolder = dbFolder[0];
 						} else {
 							// Create new folder
 							const folderId = crypto.randomUUID();
-							const folderRecord: typeof fileRecords[0] = {
+							const folderRecord: (typeof fileRecords)[0] = {
 								id: folderId,
 								projectId,
 								name: pathParts[i],
@@ -147,15 +154,15 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 								createdAt: new Date(),
 								updatedAt: new Date()
 							};
-							
+
 							fileRecords.push(folderRecord);
 							existingFolder = folderRecord;
 						}
 					}
-					
+
 					currentParentId = existingFolder.id;
 				}
-				
+
 				parentId = currentParentId;
 			}
 
@@ -179,18 +186,20 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 			}
 		});
 
-		return json({ 
-			success: true, 
+		return json({
+			success: true,
 			message: `Successfully imported ${files.length} files`,
 			filesImported: files.length,
-			projectId 
+			projectId
 		});
-
 	} catch (error) {
 		console.error('Import failed:', error);
-		return json({ 
-			error: 'Import failed', 
-			details: error instanceof Error ? error.message : 'Unknown error' 
-		}, { status: 500 });
+		return json(
+			{
+				error: 'Import failed',
+				details: error instanceof Error ? error.message : 'Unknown error'
+			},
+			{ status: 500 }
+		);
 	}
 };

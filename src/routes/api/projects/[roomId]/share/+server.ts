@@ -82,13 +82,16 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 			createdAt: new Date()
 		});
 
-		return json({ 
+		return json({
 			message: username ? 'Project shared successfully' : 'Public link created',
-			shareId 
+			shareId
 		});
 	} catch (error) {
 		console.error('Error sharing project:', error);
-		return json({ error: error instanceof Error ? error.message : 'Internal server error' }, { status: 500 });
+		return json(
+			{ error: error instanceof Error ? error.message : 'Internal server error' },
+			{ status: 500 }
+		);
 	}
 };
 
@@ -128,8 +131,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			.leftJoin(user, eq(projectShare.sharedWithUserId, user.id))
 			.where(eq(projectShare.projectId, projectData.id));
 
-		return json({ 
-			shares: shares.map(share => ({
+		return json({
+			shares: shares.map((share) => ({
 				id: share.id,
 				username: share.username,
 				permission: share.permission,
@@ -139,7 +142,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		});
 	} catch (error) {
 		console.error('Error fetching shares:', error);
-		return json({ error: error instanceof Error ? error.message : 'Internal server error' }, { status: 500 });
+		return json(
+			{ error: error instanceof Error ? error.message : 'Internal server error' },
+			{ status: 500 }
+		);
 	}
 };
 
@@ -174,12 +180,7 @@ export const DELETE: RequestHandler = async ({ params, locals, request }) => {
 		// Delete the share
 		await db
 			.delete(projectShare)
-			.where(
-				and(
-					eq(projectShare.id, shareId),
-					eq(projectShare.projectId, projectData.id)
-				)
-			);
+			.where(and(eq(projectShare.id, shareId), eq(projectShare.projectId, projectData.id)));
 
 		return json({ message: 'Share removed successfully' });
 	} catch (error) {

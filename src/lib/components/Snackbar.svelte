@@ -46,11 +46,7 @@
 		<div class="flex-1">
 			{message}
 		</div>
-		<button
-			on:click={close}
-			class="text-white/80 hover:text-white"
-			aria-label="Close notification"
-		>
+		<button on:click={close} class="text-white/80 hover:text-white" aria-label="Close notification">
 			✕
 		</button>
 	</div>

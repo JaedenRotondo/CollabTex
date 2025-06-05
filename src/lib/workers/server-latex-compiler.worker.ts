@@ -24,7 +24,7 @@ async function compileOnServer(content: string) {
 		const response = await fetch('/api/compile', {
 			method: 'POST',
 			headers: {
-				'Accept': 'application/pdf'
+				Accept: 'application/pdf'
 			},
 			body: formData
 		});
@@ -41,6 +41,7 @@ async function compileOnServer(content: string) {
 		}
 
 		const pdfBuffer = await response.arrayBuffer();
+		
 		return {
 			pdf: pdfBuffer,
 			log: 'Compilation successful'
@@ -57,15 +58,15 @@ self.addEventListener('message', async (event: MessageEvent<CompileMessage>) => 
 	if (event.data.type === 'compile') {
 		try {
 			const result = await compileOnServer(event.data.content);
+
+			// Clone the ArrayBuffer to avoid transfer issues
+			const pdfCopy = result.pdf.slice();
 			
-			self.postMessage(
-				{
-					type: 'compiled',
-					pdf: result.pdf,
-					log: result.log
-				},
-				[result.pdf]
-			);
+			self.postMessage({
+				type: 'compiled',
+				pdf: pdfCopy,
+				log: result.log
+			});
 		} catch (error) {
 			self.postMessage({
 				type: 'error',

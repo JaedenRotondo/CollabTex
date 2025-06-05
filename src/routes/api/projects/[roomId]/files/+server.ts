@@ -4,7 +4,11 @@ import { db } from '$lib/server/db';
 import { project, file, projectShare } from '$lib/server/db/schema';
 import { eq, and, or, isNull } from 'drizzle-orm';
 
-async function checkProjectAccess(roomId: string, userId: string | undefined, requireEdit: boolean = false) {
+async function checkProjectAccess(
+	roomId: string,
+	userId: string | undefined,
+	requireEdit: boolean = false
+) {
 	// Get project
 	const projects = await db.select().from(project).where(eq(project.roomId, roomId));
 
@@ -20,10 +24,7 @@ async function checkProjectAccess(roomId: string, userId: string | undefined, re
 			.select()
 			.from(projectShare)
 			.where(
-				and(
-					eq(projectShare.projectId, projectData.id),
-					isNull(projectShare.sharedWithUserId)
-				)
+				and(eq(projectShare.projectId, projectData.id), isNull(projectShare.sharedWithUserId))
 			);
 
 		if (publicShares.length === 0) {
@@ -49,10 +50,7 @@ async function checkProjectAccess(roomId: string, userId: string | undefined, re
 		.where(
 			and(
 				eq(projectShare.projectId, projectData.id),
-				or(
-					eq(projectShare.sharedWithUserId, userId),
-					isNull(projectShare.sharedWithUserId)
-				)
+				or(eq(projectShare.sharedWithUserId, userId), isNull(projectShare.sharedWithUserId))
 			)
 		);
 

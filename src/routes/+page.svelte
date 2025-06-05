@@ -49,25 +49,25 @@
 	async function handleFileUpload(event: Event) {
 		const target = event.target as HTMLInputElement;
 		const files = target.files;
-		
+
 		if (!files || files.length === 0) return;
 
 		importing = true;
 		try {
 			// Create a new room for the imported project
 			const newRoomId = generateRoomId();
-			
+
 			const formData = new FormData();
-			
+
 			// Add all files to form data
-			Array.from(files).forEach(file => {
+			Array.from(files).forEach((file) => {
 				formData.append('files', file);
 			});
-			
+
 			// Add project name based on folder name or file name
 			const firstFile = files[0] as any;
 			let projectName = 'Imported Project';
-			
+
 			if (firstFile.webkitRelativePath) {
 				// Folder import - use folder name
 				projectName = firstFile.webkitRelativePath.split('/')[0];
@@ -78,7 +78,7 @@
 				// Multiple files import
 				projectName = 'Imported Files';
 			}
-			
+
 			formData.append('projectName', projectName);
 
 			const response = await fetch(`/api/projects/${newRoomId}/import`, {
@@ -94,7 +94,9 @@
 			} else {
 				console.error('Import failed:', result.error);
 				if (result.error === 'Authentication required') {
-					alert('Please log in to import projects. You can import projects after creating an account.');
+					alert(
+						'Please log in to import projects. You can import projects after creating an account.'
+					);
 				} else {
 					alert(`Import failed: ${result.error}`);
 				}
@@ -116,9 +118,9 @@
 				showImportOptions = false;
 			}
 		}
-		
+
 		document.addEventListener('click', handleClickOutside);
-		
+
 		return () => {
 			document.removeEventListener('click', handleClickOutside);
 		};
@@ -145,7 +147,7 @@
 					>
 						Create New Room
 					</Button>
-					
+
 					<div class="relative">
 						<Button
 							on:click={handleImport}
@@ -162,20 +164,22 @@
 								Import Project
 							{/if}
 						</Button>
-						
+
 						{#if showImportOptions}
-							<div class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-								<div class="p-2 space-y-1">
+							<div
+								class="absolute top-full right-0 left-0 z-10 mt-2 rounded-lg border border-gray-200 bg-white shadow-lg"
+							>
+								<div class="space-y-1 p-2">
 									<button
 										on:click={handleImportFiles}
-										class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded flex items-center"
+										class="flex w-full items-center rounded px-3 py-2 text-left text-sm hover:bg-gray-100"
 									>
 										<Upload size={16} class="mr-2" />
 										Import Files (.tex, .bib, etc.)
 									</button>
 									<button
 										on:click={handleImportFolder}
-										class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded flex items-center"
+										class="flex w-full items-center rounded px-3 py-2 text-left text-sm hover:bg-gray-100"
 									>
 										<Upload size={16} class="mr-2" />
 										Import Folder (entire project)
@@ -226,7 +230,7 @@
 		<div class="mt-6 text-center">
 			<p class="text-sm text-gray-600">
 				Want to save your projects?
-				<a href="/demo/lucia/login" class="text-overleaf-green hover:underline font-medium">
+				<a href="/demo/lucia/login" class="text-overleaf-green font-medium hover:underline">
 					Login / Register
 				</a>
 			</p>

@@ -4,7 +4,14 @@
 	import { Button } from '$lib/components/ui/button';
 	import { compileLatex, type CompileError } from '$lib/latex/compiler';
 	import type * as Y from 'yjs';
-	import { AlertCircle, CheckCircle, Share2, Upload, ChevronsUp, ChevronsDown } from 'lucide-svelte';
+	import {
+		AlertCircle,
+		CheckCircle,
+		Share2,
+		Upload,
+		ChevronsUp,
+		ChevronsDown
+	} from 'lucide-svelte';
 
 	export let ydoc: Y.Doc;
 	export let activeFile: Y.Map<{ id: string }>;
@@ -102,18 +109,18 @@
 	async function handleFileUpload(event: Event) {
 		const target = event.target as HTMLInputElement;
 		const files = target.files;
-		
+
 		if (!files || files.length === 0) return;
 
 		importing = true;
 		try {
 			const formData = new FormData();
-			
+
 			// Add all files to form data
-			Array.from(files).forEach(file => {
+			Array.from(files).forEach((file) => {
 				formData.append('files', file);
 			});
-			
+
 			// Add project name (optional)
 			formData.append('projectName', 'Imported Project');
 
@@ -182,10 +189,10 @@
 		{/if}
 
 		<Button variant="outline" size="sm" on:click={handleDownload}>Download PDF</Button>
-		
-		<Button 
-			variant="outline" 
-			size="sm" 
+
+		<Button
+			variant="outline"
+			size="sm"
 			on:click={handleImport}
 			disabled={importing}
 			id="toolbar-import"
@@ -203,17 +210,17 @@
 	<div class="flex items-center gap-4">
 		<div class="text-muted-foreground text-sm">CollabTeX Editor</div>
 
-		<div class="flex items-center gap-1 border-l pl-2 ml-2">
+		<div class="ml-2 flex items-center gap-1 border-l pl-2">
 			<button
 				on:click={handleFoldAll}
-				class="p-1 rounded hover:bg-gray-200"
+				class="rounded p-1 hover:bg-gray-200"
 				title="Fold all sections"
 			>
 				<ChevronsUp size={16} />
 			</button>
 			<button
 				on:click={handleUnfoldAll}
-				class="p-1 rounded hover:bg-gray-200"
+				class="rounded p-1 hover:bg-gray-200"
 				title="Unfold all sections"
 			>
 				<ChevronsDown size={16} />

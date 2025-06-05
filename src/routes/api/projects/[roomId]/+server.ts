@@ -20,7 +20,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		// Check if user has access (owner or shared with)
 		if (locals.user) {
 			const isOwner = projectData.ownerId === locals.user.id;
-			
+
 			if (!isOwner) {
 				// Check if project is shared with this user
 				const shares = await db
@@ -46,10 +46,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				.select()
 				.from(projectShare)
 				.where(
-					and(
-						eq(projectShare.projectId, projectData.id),
-						isNull(projectShare.sharedWithUserId)
-					)
+					and(eq(projectShare.projectId, projectData.id), isNull(projectShare.sharedWithUserId))
 				);
 
 			if (publicShares.length === 0) {
@@ -179,7 +176,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		await db.transaction(async (tx) => {
 			// 1. Delete all files for this project
 			await tx.delete(file).where(eq(file.projectId, projectData.id));
-			
+
 			// 2. Delete all shares for this project
 			await tx.delete(projectShare).where(eq(projectShare.projectId, projectData.id));
 

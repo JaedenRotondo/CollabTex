@@ -26,7 +26,7 @@ export class ServerLatexCompiler implements ServerLatexEngine {
 			const response = await fetch(`${this.serverUrl}/compile`, {
 				method: 'POST',
 				headers: {
-					'Accept': 'application/pdf'
+					Accept: 'application/pdf'
 				},
 				body: formData
 			});
@@ -36,15 +36,17 @@ export class ServerLatexCompiler implements ServerLatexEngine {
 				return {
 					error: `Server compilation failed: ${response.statusText}`,
 					log: errorText,
-					errors: [{
-						message: `Compilation failed with status ${response.status}: ${errorText}`,
-						type: 'error'
-					}]
+					errors: [
+						{
+							message: `Compilation failed with status ${response.status}: ${errorText}`,
+							type: 'error'
+						}
+					]
 				};
 			}
 
 			const pdfBuffer = await response.arrayBuffer();
-			
+
 			return {
 				pdf: pdfBuffer,
 				log: 'Compilation successful',
@@ -55,10 +57,12 @@ export class ServerLatexCompiler implements ServerLatexEngine {
 			return {
 				error: `Failed to connect to LaTeX server: ${errorMessage}`,
 				log: '',
-				errors: [{
-					message: `Server connection failed: ${errorMessage}`,
-					type: 'error'
-				}]
+				errors: [
+					{
+						message: `Server connection failed: ${errorMessage}`,
+						type: 'error'
+					}
+				]
 			};
 		}
 	}

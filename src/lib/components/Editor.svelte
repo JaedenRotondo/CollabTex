@@ -4,11 +4,7 @@
 	import { EditorState } from '@codemirror/state';
 	import { latex } from '$lib/editor/latex-language';
 	import { autocompletion } from '@codemirror/autocomplete';
-	import { 
-		codeFolding, 
-		foldGutter, 
-		foldKeymap
-	} from '@codemirror/language';
+	import { codeFolding, foldGutter, foldKeymap } from '@codemirror/language';
 	import { keymap } from '@codemirror/view';
 	import * as Y from 'yjs';
 	import { yCollab } from 'y-codemirror.next';
@@ -80,8 +76,20 @@
 	function loadFile(fileId: string) {
 		console.log('Loading file:', fileId);
 		const file = files.get(fileId);
-		if (!file || file.type !== 'file') {
-			console.warn('File not found or is not a file:', fileId);
+		if (!file) {
+			console.warn('File not found:', fileId);
+			console.log('Available files:', Array.from(files.keys()));
+			
+			// Try to find a valid file and set it as active
+			const availableFiles = Array.from(files.values()).filter(f => f.type === 'file');
+			if (availableFiles.length > 0) {
+				console.log('Setting first available file as active:', availableFiles[0].id);
+				activeFile.set('id', { id: availableFiles[0].id });
+			}
+			return;
+		}
+		if (file.type !== 'file') {
+			console.warn('File is not a file type:', fileId, 'type:', file.type);
 			return;
 		}
 

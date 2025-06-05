@@ -45,10 +45,10 @@
 
 	async function createProject() {
 		if (!newProjectName.trim()) return;
-		
+
 		creatingProject = true;
 		const roomId = crypto.randomUUID();
-		
+
 		try {
 			const response = await fetch(`/api/projects/${roomId}`, {
 				method: 'POST',
@@ -83,7 +83,7 @@
 				throw new Error('Failed to delete project');
 			}
 
-			projects = projects.filter(p => p.id !== projectId);
+			projects = projects.filter((p) => p.id !== projectId);
 		} catch (err) {
 			error = 'Failed to delete project';
 			console.error(err);
@@ -106,11 +106,11 @@
 	}
 </script>
 
-<div class="min-h-screen bg-background">
+<div class="bg-background min-h-screen">
 	<div class="container mx-auto px-4 py-8">
-		<div class="flex justify-between items-center mb-8">
+		<div class="mb-8 flex items-center justify-between">
 			<div>
-				<h1 class="text-3xl font-bold mb-2">My Projects</h1>
+				<h1 class="mb-2 text-3xl font-bold">My Projects</h1>
 				<p class="text-muted-foreground">Welcome back, {data.user.username}!</p>
 			</div>
 			<form method="post" action="/demo/lucia?/logout">
@@ -119,19 +119,19 @@
 		</div>
 
 		{#if error}
-			<div class="bg-destructive/10 text-destructive p-4 rounded-md mb-4">
+			<div class="bg-destructive/10 text-destructive mb-4 rounded-md p-4">
 				{error}
 			</div>
 		{/if}
 
-		<div class="bg-card rounded-lg p-6 mb-6">
-			<h2 class="text-xl font-semibold mb-4">Create New Project</h2>
+		<div class="bg-card mb-6 rounded-lg p-6">
+			<h2 class="mb-4 text-xl font-semibold">Create New Project</h2>
 			<form on:submit|preventDefault={createProject} class="flex gap-4">
 				<input
 					type="text"
 					bind:value={newProjectName}
 					placeholder="Project name"
-					class="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+					class="focus:ring-primary flex-1 rounded-md border px-4 py-2 focus:ring-2 focus:outline-none"
 					disabled={creatingProject}
 				/>
 				<Button type="submit" disabled={creatingProject || !newProjectName.trim()}>
@@ -141,8 +141,8 @@
 		</div>
 
 		<div class="bg-card rounded-lg p-6">
-			<h2 class="text-xl font-semibold mb-4">Your Projects</h2>
-			
+			<h2 class="mb-4 text-xl font-semibold">Your Projects</h2>
+
 			{#if loading}
 				<p class="text-muted-foreground">Loading projects...</p>
 			{:else if projects.length === 0}
@@ -150,9 +150,9 @@
 			{:else}
 				<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{#each projects as project}
-						<div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
-							<h3 class="font-semibold text-lg mb-2">{project.name}</h3>
-							<p class="text-sm text-muted-foreground mb-3">
+						<div class="rounded-lg border p-4 transition-shadow hover:shadow-md">
+							<h3 class="mb-2 text-lg font-semibold">{project.name}</h3>
+							<p class="text-muted-foreground mb-3 text-sm">
 								Updated: {formatDate(project.updatedAt)}
 							</p>
 							<div class="flex gap-2">
@@ -163,11 +163,7 @@
 								>
 									Open
 								</Button>
-								<Button
-									variant="outline"
-									size="sm"
-									on:click={() => openShareModal(project)}
-								>
+								<Button variant="outline" size="sm" on:click={() => openShareModal(project)}>
 									Share
 								</Button>
 								<Button

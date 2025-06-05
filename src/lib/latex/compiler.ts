@@ -20,7 +20,7 @@ let serverUrl = '';
 export function configureCompiler(options: { useServer: boolean; serverUrl?: string }) {
 	useServerCompilation = options.useServer;
 	serverUrl = options.serverUrl || 'http://localhost:8000';
-	
+
 	// Clear existing worker if switching compilation mode
 	if (worker) {
 		worker.terminate();
@@ -71,7 +71,7 @@ export async function compileLatex(content: string): Promise<CompileResult> {
 		};
 
 		worker!.addEventListener('message', messageHandler);
-		
+
 		// Both workers now use the same message format
 		worker!.postMessage({ type: 'compile', content });
 	});

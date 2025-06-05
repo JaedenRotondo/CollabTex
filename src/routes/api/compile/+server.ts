@@ -7,7 +7,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const formData = await request.formData();
 		const file = formData.get('file') as File;
-		
+
 		if (!file) {
 			return json({ error: 'No file provided' }, { status: 400 });
 		}
@@ -19,17 +19,14 @@ export const POST: RequestHandler = async ({ request }) => {
 		const response = await fetch(`${LATEX_SERVER_URL}/compile`, {
 			method: 'POST',
 			headers: {
-				'Accept': 'application/pdf'
+				Accept: 'application/pdf'
 			},
 			body: serverFormData
 		});
 
 		if (!response.ok) {
 			const errorText = await response.text();
-			return json(
-				{ error: `LaTeX compilation failed: ${errorText}` },
-				{ status: response.status }
-			);
+			return json({ error: `LaTeX compilation failed: ${errorText}` }, { status: response.status });
 		}
 
 		// Get the PDF data
