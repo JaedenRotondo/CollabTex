@@ -28,6 +28,7 @@
 	let showErrors = false;
 	let shareModalOpen = false;
 	let projectName = 'Untitled Project';
+	let editorComponent: any;
 
 	onMount(() => {
 		console.log('Initializing collaboration for room:', roomId);
@@ -142,6 +143,8 @@
 				on:share={handleShare}
 				on:import={handleImport}
 				on:importError={handleImportError}
+				on:foldAll={() => editorComponent?.foldAllSections()}
+				on:unfoldAll={() => editorComponent?.unfoldAllSections()}
 				{ydoc}
 				{activeFile}
 			/>
@@ -168,7 +171,7 @@
 			<div class="relative flex flex-1">
 				<div class="relative" style="width: {splitPosition}%">
 					{#if files && activeFile}
-						<Editor {ydoc} {provider} {files} {activeFile} />
+						<Editor bind:this={editorComponent} {ydoc} {provider} {files} {activeFile} />
 					{/if}
 					<CompileErrors
 						errors={compileErrors}

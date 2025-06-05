@@ -2,10 +2,13 @@
 	import { goto } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
 	import { Upload } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 
 	let roomId = '';
 	let importing = false;
 	let fileInput: HTMLInputElement;
+	let folderInput: HTMLInputElement;
+	let showImportOptions = false;
 
 	function createNewRoom() {
 		const newRoomId = generateRoomId();
@@ -30,7 +33,17 @@
 	}
 
 	function handleImport() {
+		showImportOptions = !showImportOptions;
+	}
+
+	function handleImportFiles() {
 		fileInput?.click();
+		showImportOptions = false;
+	}
+
+	function handleImportFolder() {
+		folderInput?.click();
+		showImportOptions = false;
 	}
 
 	async function handleFileUpload(event: Event) {
@@ -51,10 +64,22 @@
 				formData.append('files', file);
 			});
 			
-			// Add project name based on folder name or use "Imported Project"
+			// Add project name based on folder name or file name
 			const firstFile = files[0] as any;
-			const folderName = firstFile.webkitRelativePath?.split('/')[0] || 'Imported Project';
-			formData.append('projectName', folderName);
+			let projectName = 'Imported Project';
+			
+			if (firstFile.webkitRelativePath) {
+				// Folder import - use folder name
+				projectName = firstFile.webkitRelativePath.split('/')[0];
+			} else if (files.length === 1) {
+				// Single file import - use file name without extension
+				projectName = firstFile.name.replace(/\.[^/.]+$/, '');
+			} else {
+				// Multiple files import
+				projectName = 'Imported Files';
+			}
+			
+			formData.append('projectName', projectName);
 
 			const response = await fetch(`/api/projects/${newRoomId}/import`, {
 				method: 'POST',
@@ -83,6 +108,21 @@
 			target.value = '';
 		}
 	}
+
+	// Close import options when clicking outside
+	onMount(() => {
+		function handleClickOutside(event: MouseEvent) {
+			if (showImportOptions && !(event.target as Element)?.closest('.relative')) {
+				showImportOptions = false;
+			}
+		}
+		
+		document.addEventListener('click', handleClickOutside);
+		
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
+	});
 </script>
 
 <div
@@ -106,21 +146,44 @@
 						Create New Room
 					</Button>
 					
-					<Button
-						on:click={handleImport}
-						size="lg"
-						variant="outline"
-						class="w-full"
-						disabled={importing}
-					>
-						{#if importing}
-							<span class="mr-2 animate-spin">⟳</span>
-							Importing...
-						{:else}
-							<Upload size={20} class="mr-2" />
-							Import Project
+					<div class="relative">
+						<Button
+							on:click={handleImport}
+							size="lg"
+							variant="outline"
+							class="w-full"
+							disabled={importing}
+						>
+							{#if importing}
+								<span class="mr-2 animate-spin">⟳</span>
+								Importing...
+							{:else}
+								<Upload size={20} class="mr-2" />
+								Import Project
+							{/if}
+						</Button>
+						
+						{#if showImportOptions}
+							<div class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+								<div class="p-2 space-y-1">
+									<button
+										on:click={handleImportFiles}
+										class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded flex items-center"
+									>
+										<Upload size={16} class="mr-2" />
+										Import Files (.tex, .bib, etc.)
+									</button>
+									<button
+										on:click={handleImportFolder}
+										class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded flex items-center"
+									>
+										<Upload size={16} class="mr-2" />
+										Import Folder (entire project)
+									</button>
+								</div>
+							</div>
 						{/if}
-					</Button>
+					</div>
 				</div>
 			</div>
 
@@ -171,9 +234,18 @@
 	</div>
 </div>
 
-<!-- Hidden file input for import -->
+<!-- Hidden file inputs for import -->
 <input
 	bind:this={fileInput}
+	type="file"
+	multiple
+	accept=".tex,.bib,.cls,.sty,.txt,.md"
+	on:change={handleFileUpload}
+	style="display: none;"
+/>
+
+<input
+	bind:this={folderInput}
 	type="file"
 	multiple
 	webkitdirectory

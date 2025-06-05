@@ -1,0 +1,75 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\title{Test Document for Code Folding}
+\author{CollabTeX Team}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This is the introduction section. It contains some text that should be foldable
+when you click on the fold indicator in the gutter next to the section command.
+
+\subsection{Background}
+This subsection should also be foldable independently. When folded, only the
+subsection title should be visible.
+
+\section{Methods}
+Here's another section that can be folded.
+
+\begin{itemize}
+    \item First item
+    \item Second item
+    \item Third item with some longer text that spans
+          multiple lines to test folding
+\end{itemize}
+
+\begin{equation}
+    E = mc^2
+\end{equation}
+
+\section{Results}
+The results section contains various environments:
+
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.5\textwidth]{example.png}
+    \caption{Example figure that should be foldable}
+    \label{fig:example}
+\end{figure}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Column 1 & Column 2 & Column 3 \\
+        \hline
+        Data 1 & Data 2 & Data 3 \\
+        \hline
+    \end{tabular}
+    \caption{Example table}
+    \label{tab:example}
+\end{table}
+
+% This is a comment block
+% that spans multiple lines
+% and should be foldable as a unit
+% when the folding system detects it
+
+\section{Discussion}
+Final section with some discussion text.
+
+\subsection{Limitations}
+Discussion of limitations.
+
+\subsection{Future Work}
+Ideas for future work.
+
+\section{Conclusion}
+The conclusion wraps up the document.
+
+\end{document}

@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { compileLatex, type CompileError } from '$lib/latex/compiler';
 	import type * as Y from 'yjs';
-	import { AlertCircle, CheckCircle, Share2, Upload } from 'lucide-svelte';
+	import { AlertCircle, CheckCircle, Share2, Upload, ChevronsUp, ChevronsDown } from 'lucide-svelte';
 
 	export let ydoc: Y.Doc;
 	export let activeFile: Y.Map<{ id: string }>;
@@ -85,6 +85,14 @@
 
 	function handleShare() {
 		dispatch('share');
+	}
+
+	function handleFoldAll() {
+		dispatch('foldAll');
+	}
+
+	function handleUnfoldAll() {
+		dispatch('unfoldAll');
 	}
 
 	function handleImport() {
@@ -194,6 +202,23 @@
 
 	<div class="flex items-center gap-4">
 		<div class="text-muted-foreground text-sm">CollabTeX Editor</div>
+
+		<div class="flex items-center gap-1 border-l pl-2 ml-2">
+			<button
+				on:click={handleFoldAll}
+				class="p-1 rounded hover:bg-gray-200"
+				title="Fold all sections"
+			>
+				<ChevronsUp size={16} />
+			</button>
+			<button
+				on:click={handleUnfoldAll}
+				class="p-1 rounded hover:bg-gray-200"
+				title="Unfold all sections"
+			>
+				<ChevronsDown size={16} />
+			</button>
+		</div>
 
 		<Button variant="outline" size="sm" on:click={handleShare}>
 			<Share2 size={16} class="mr-1" />

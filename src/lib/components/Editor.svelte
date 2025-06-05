@@ -4,9 +4,17 @@
 	import { EditorState } from '@codemirror/state';
 	import { javascript } from '@codemirror/lang-javascript';
 	import { autocompletion } from '@codemirror/autocomplete';
+	import { 
+		codeFolding, 
+		foldGutter, 
+		foldKeymap
+	} from '@codemirror/language';
+	import { keymap } from '@codemirror/view';
 	import * as Y from 'yjs';
 	import { yCollab } from 'y-codemirror.next';
 	import { latexCompletions } from '$lib/editor/latex-completions';
+	import { latexFoldService } from '$lib/editor/latex-folding';
+	import { foldGutterTheme } from '$lib/editor/fold-gutter-theme';
 	import type { WebrtcProvider } from 'y-webrtc';
 	import type { FileNode } from '$lib/collaboration/yjs-setup';
 
@@ -104,11 +112,16 @@
 				basicSetup,
 				javascript(), // We'll use JS highlighting for now as LaTeX isn't available
 				createTheme(),
+				foldGutterTheme,
 				autocompletion({
 					override: [latexCompletions]
 				}),
 				yCollab(ytext, provider.awareness, { undoManager }),
-				EditorView.lineWrapping
+				EditorView.lineWrapping,
+				codeFolding(),
+				foldGutter(),
+				keymap.of(foldKeymap),
+				latexFoldService
 			]
 		});
 
@@ -181,11 +194,16 @@
 				basicSetup,
 				javascript(), // We'll use JS highlighting for now as LaTeX isn't available
 				createTheme(),
+				foldGutterTheme,
 				autocompletion({
 					override: [latexCompletions]
 				}),
 				yCollab(ytext, provider.awareness, { undoManager }),
-				EditorView.lineWrapping
+				EditorView.lineWrapping,
+				codeFolding(),
+				foldGutter(),
+				keymap.of(foldKeymap),
+				latexFoldService
 			]
 		});
 
@@ -201,6 +219,17 @@
 		console.log('Destroying CodeMirror editor');
 		view?.destroy();
 	});
+
+	// Export folding control functions
+	export function foldAllSections() {
+		// TODO: Implement fold all functionality
+		console.log('Fold all not yet implemented');
+	}
+
+	export function unfoldAllSections() {
+		// TODO: Implement unfold all functionality
+		console.log('Unfold all not yet implemented');
+	}
 </script>
 
 <div bind:this={editorContainer} class="h-full w-full overflow-hidden"></div>
