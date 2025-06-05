@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
 	import { compileLatex, type CompileError } from '$lib/latex/compiler';
 	import type * as Y from 'yjs';
@@ -10,7 +11,8 @@
 		Share2,
 		Upload,
 		ChevronsUp,
-		ChevronsDown
+		ChevronsDown,
+		Home
 	} from 'lucide-svelte';
 
 	export let ydoc: Y.Doc;
@@ -106,6 +108,10 @@
 		fileInput?.click();
 	}
 
+	function handleHome() {
+		goto('/dashboard');
+	}
+
 	async function handleFileUpload(event: Event) {
 		const target = event.target as HTMLInputElement;
 		const files = target.files;
@@ -158,6 +164,15 @@
 
 <div class="bg-overleaf-toolbar flex items-center justify-between border-b px-4 py-2">
 	<div class="flex items-center gap-2">
+		<Button
+			variant="outline"
+			size="sm"
+			on:click={handleHome}
+			title="Go to Dashboard"
+		>
+			<Home size={16} />
+		</Button>
+
 		<Button
 			variant="default"
 			size="sm"
