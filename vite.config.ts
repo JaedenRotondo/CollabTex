@@ -6,5 +6,9 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	worker: {
 		format: 'es'
+	},
+	server: {
+		port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
+		host: true
 	}
 });

@@ -2,6 +2,7 @@ import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 import { IndexeddbPersistence } from 'y-indexeddb';
 import { FileSync } from './file-sync';
+import { config } from '$lib/config';
 
 export interface FileNode {
 	id: string;
@@ -37,8 +38,13 @@ export function initializeCollaboration(roomId: string): CollaborationInstance {
 	console.log('Creating WebRTC provider...');
 
 	// WebRTC provider for P2P collaboration
+	// Append API key to signaling URL if provided
+	const signalingUrl = config.signaling.apiKey 
+		? `${config.signaling.url}?apiKey=${config.signaling.apiKey}`
+		: config.signaling.url;
+	
 	const provider = new WebrtcProvider(roomId, ydoc, {
-		signaling: ['ws://localhost:4444'],
+		signaling: [signalingUrl],
 		maxConns: 20,
 		filterBcConns: true,
 		peerOpts: {}

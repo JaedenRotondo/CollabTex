@@ -1,26 +1,28 @@
 import type { Handle } from '@sveltejs/kit';
-import * as auth from '$lib/server/auth.js';
+import { validateSessionToken } from '$lib/server/auth.js';
 
-const handleAuth: Handle = async ({ event, resolve }) => {
-	const sessionToken = event.cookies.get(auth.sessionCookieName);
+// Set the port for Render deployment
+if (process.env.PORT) {
+	process.env.BODY_SIZE_LIMIT = '10mb';
+}
 
-	if (!sessionToken) {
+export const handle: Handle = async ({ event, resolve }) => {
+	const sessionId = event.cookies.get('session');
+
+	if (!sessionId) {
 		event.locals.user = null;
 		event.locals.session = null;
 		return resolve(event);
 	}
 
-	const { session, user } = await auth.validateSessionToken(sessionToken);
-
+	const { session, user } = await validateSessionToken(sessionId);
 	if (session) {
-		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+		event.locals.user = user;
+		event.locals.session = session;
 	} else {
-		auth.deleteSessionTokenCookie(event);
+		event.locals.user = null;
+		event.locals.session = null;
 	}
 
-	event.locals.user = user;
-	event.locals.session = session;
 	return resolve(event);
 };
-
-export const handle: Handle = handleAuth;
