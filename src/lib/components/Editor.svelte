@@ -157,7 +157,7 @@
 				borderLeftColor: '#138A36'
 			},
 			'.cm-focused .cm-selectionBackground, ::selection': {
-				backgroundColor: '#E8F5E8'
+				backgroundColor: '#4A90E2'
 			},
 			'.cm-gutters': {
 				backgroundColor: '#F8F9FA',
@@ -168,11 +168,8 @@
 				color: '#BDBDBD',
 				fontSize: '13px'
 			},
-			'.cm-activeLine': {
-				backgroundColor: '#FFFEF7'
-			},
 			'.cm-activeLineGutter': {
-				backgroundColor: '#F5F6F7'
+				backgroundColor: '#E8F2FF'
 			}
 		});
 	}
