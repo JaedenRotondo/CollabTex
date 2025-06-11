@@ -24,3 +24,16 @@ vite.config.ts.timestamp-*
 
 # SQLite
 *.db
+
+# Claude & Planning Documents
+.claude
+CLAUDE.md
+P2P_OVERLEAF_PLAN.md
+DEPLOYMENT.md
+SIGNALING_SERVER_SECURITY.md
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.development

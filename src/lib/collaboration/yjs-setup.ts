@@ -38,16 +38,13 @@ export function initializeCollaboration(roomId: string): CollaborationInstance {
 	console.log('Creating WebRTC provider...');
 
 	// WebRTC provider for P2P collaboration
-	// Append API key to signaling URL if provided
-	const signalingUrl = config.signaling.apiKey 
-		? `${config.signaling.url}?apiKey=${config.signaling.apiKey}`
-		: config.signaling.url;
-	
 	const provider = new WebrtcProvider(roomId, ydoc, {
-		signaling: [signalingUrl],
+		signaling: [config.signaling.url],
 		maxConns: 20,
 		filterBcConns: true,
-		peerOpts: {}
+		peerOpts: {},
+		// Reduce reconnection attempts
+		signalReconnectTimeout: 30000
 	});
 
 	console.log('Setting user awareness...');

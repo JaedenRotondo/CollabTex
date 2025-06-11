@@ -10,7 +10,7 @@ Building a peer-to-peer collaborative LaTeX editor with real-time collaboration,
 - **P2P Collaboration**: YJS with WebRTC provider
 - **LaTeX Compilation**: TeXLive.js (WebAssembly LaTeX compiler)
 - **PDF Viewer**: PDF.js
-- **Code Editor**: CodeMirror 6 with LaTeX support
+- **Code Editor**: CodeMirror 6 with custom LaTeX support
 - **Deployment**: Cloudflare Pages/Workers
 
 ## Architecture

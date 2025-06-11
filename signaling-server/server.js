@@ -1,5 +1,4 @@
 import { WebSocketServer } from 'ws';
-import crypto from 'crypto';
 import { createRequire } from 'module';
 
 // Create require function for CommonJS modules
@@ -9,14 +8,8 @@ const { setupWSConnection } = require('y-websocket/bin/utils');
 // Configuration
 const PORT = process.env.PORT || 4444;
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',');
-const API_KEY = process.env.SIGNALING_API_KEY || crypto.randomBytes(32).toString('hex');
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const RATE_LIMIT_MAX = 100; // Max connections per IP per window
-
-// Log the API key on startup (only in development)
-if (process.env.NODE_ENV !== 'production') {
-  console.log('Signaling Server API Key:', API_KEY);
-}
 
 // Rate limiting store
 const rateLimitStore = new Map();
@@ -64,15 +57,7 @@ const wss = new WebSocketServer({
       return;
     }
     
-    // Extract API key from URL or headers
-    const url = new URL(req.url, `http://${req.headers.host}`);
-    const apiKey = url.searchParams.get('apiKey') || req.headers['x-api-key'];
-    
-    if (!apiKey || apiKey !== API_KEY) {
-      console.log(`Rejected connection with invalid API key from ${origin}`);
-      cb(false, 401, 'Unauthorized');
-      return;
-    }
+    // API key check removed - origin validation is sufficient
     
     // Connection allowed
     console.log(`Accepted connection from ${origin} (IP: ${ip})`);
