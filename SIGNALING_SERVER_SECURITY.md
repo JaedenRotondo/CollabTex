@@ -34,7 +34,6 @@ This guide explains how to secure your CollabTex signaling server so it only acc
    - **Build Command**: `npm install`
    - **Start Command**: `npm start`
    - **Environment**: Node
-   - **Plan**: Free tier is sufficient for small projects
 
 ### 2. Set Environment Variables on Render
 
