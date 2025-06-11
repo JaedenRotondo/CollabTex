@@ -58,10 +58,16 @@ export const actions: Actions = {
 		const password = formData.get('password');
 
 		if (!validateUsername(username)) {
-			return fail(400, { message: 'Invalid username' });
+			return fail(400, { 
+				message: 'Username must be 3-31 characters long and contain only lowercase letters, numbers, hyphens, and underscores',
+				username 
+			});
 		}
 		if (!validatePassword(password)) {
-			return fail(400, { message: 'Invalid password' });
+			return fail(400, { 
+				message: 'Password must be between 6 and 255 characters long',
+				username 
+			});
 		}
 
 		const userId = generateUserId();
@@ -79,8 +85,19 @@ export const actions: Actions = {
 			const sessionToken = auth.generateSessionToken();
 			const session = await auth.createSession(sessionToken, userId);
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-		} catch {
-			return fail(500, { message: 'An error has occurred' });
+		} catch (error) {
+			// Check if it's a unique constraint violation (duplicate username)
+			if (error instanceof Error && error.message.includes('UNIQUE constraint failed')) {
+				return fail(400, { 
+					message: 'Username already taken. Please choose a different username.',
+					username
+				});
+			}
+			console.error('Registration error:', error);
+			return fail(500, { 
+				message: 'Unable to create account. Please try again later.',
+				username
+			});
 		}
 		return redirect(302, '/dashboard');
 	}

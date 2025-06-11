@@ -7,7 +7,7 @@ if (process.env.PORT) {
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const sessionId = event.cookies.get('session');
+	const sessionId = event.cookies.get('auth-session');
 
 	if (!sessionId) {
 		event.locals.user = null;
