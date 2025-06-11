@@ -1,6 +1,10 @@
 import { WebSocketServer } from 'ws';
-import { setupWSConnection } from 'y-websocket/bin/utils.js';
 import crypto from 'crypto';
+import { createRequire } from 'module';
+
+// Create require function for CommonJS modules
+const require = createRequire(import.meta.url);
+const { setupWSConnection } = require('y-websocket/bin/utils');
 
 // Configuration
 const PORT = process.env.PORT || 4444;
@@ -80,7 +84,7 @@ wss.on('connection', (ws, req) => {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   console.log(`WebSocket connected from IP: ${ip}`);
   
-  // Set up YJS connection
+  // Set up YJS connection using y-websocket
   setupWSConnection(ws, req);
   
   ws.on('close', () => {
