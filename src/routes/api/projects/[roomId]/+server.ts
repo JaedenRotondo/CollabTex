@@ -90,19 +90,6 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 			id: projectId,
 			roomId,
 			name,
-			ownerId: locals.user.id,
-			createdAt: now,
-			updatedAt: now
-		});
-
-		// Create default main.tex file
-		const fileId = `file-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-		await db.insert(file).values({
-			id: fileId,
-			projectId: projectId,
-			name: 'main.tex',
-			path: '/main.tex',
-			type: 'file',
 			content: `\\documentclass{article}
 \\usepackage{graphicx}
 \\usepackage{amsmath}
@@ -119,7 +106,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 Start writing your LaTeX document here...
 
 \\end{document}`,
-			parentId: null,
+			ownerId: locals.user.id,
 			createdAt: now,
 			updatedAt: now
 		});
@@ -133,16 +120,22 @@ Start writing your LaTeX document here...
 				createdAt: now,
 				updatedAt: now
 			},
-			files: [
-				{
-					id: fileId,
-					projectId: projectId,
-					name: 'main.tex',
-					path: '/main.tex',
-					type: 'file',
-					parentId: null
-				}
-			]
+			content: `\\documentclass{article}
+\\usepackage{graphicx}
+\\usepackage{amsmath}
+
+\\title{${name}}
+\\author{${locals.user.username}}
+\\date{\\today}
+
+\\begin{document}
+
+\\maketitle
+
+\\section{Introduction}
+Start writing your LaTeX document here...
+
+\\end{document}`
 		});
 	} catch (error) {
 		console.error('Error creating project:', error);

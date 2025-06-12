@@ -19,6 +19,7 @@ export const project = sqliteTable('project', {
 	id: text('id').primaryKey(),
 	roomId: text('room_id').notNull().unique(),
 	name: text('name').notNull(),
+	content: text('content'),
 	ownerId: text('owner_id')
 		.notNull()
 		.references(() => user.id),
