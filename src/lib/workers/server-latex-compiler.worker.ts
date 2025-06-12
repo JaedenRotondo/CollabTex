@@ -41,7 +41,7 @@ async function compileOnServer(content: string) {
 		}
 
 		const pdfBuffer = await response.arrayBuffer();
-		
+
 		return {
 			pdf: pdfBuffer,
 			log: 'Compilation successful'
@@ -61,7 +61,7 @@ self.addEventListener('message', async (event: MessageEvent<CompileMessage>) => 
 
 			// Clone the ArrayBuffer to avoid transfer issues
 			const pdfCopy = result.pdf.slice();
-			
+
 			self.postMessage({
 				type: 'compiled',
 				pdf: pdfCopy,

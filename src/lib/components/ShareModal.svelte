@@ -173,14 +173,22 @@
 
 {#if isOpen}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" on:click={close}>
-		<div class="w-full max-w-lg rounded-lg bg-academic-paper border border-academic-border p-6 shadow-xl" on:click|stopPropagation>
+		<div
+			class="bg-academic-paper border-academic-border w-full max-w-lg rounded-lg border p-6 shadow-xl"
+			on:click|stopPropagation
+		>
 			<div class="mb-4 flex items-center justify-between">
-				<h2 class="text-xl font-semibold text-academic-gray-900">Share "{projectName}"</h2>
-				<button on:click={close} class="text-academic-gray-500 hover:text-academic-gray-700 transition-colors duration-200"> ✕ </button>
+				<h2 class="text-academic-gray-900 text-xl font-semibold">Share "{projectName}"</h2>
+				<button
+					on:click={close}
+					class="text-academic-gray-500 hover:text-academic-gray-700 transition-colors duration-200"
+				>
+					✕
+				</button>
 			</div>
 
 			{#if error}
-				<div class="mb-4 rounded bg-red-50 border border-red-200 p-3 text-sm text-academic-error">
+				<div class="text-academic-error mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm">
 					{error}
 				</div>
 			{/if}
@@ -189,14 +197,16 @@
 				<!-- Show room link for non-owners -->
 				<div class="space-y-4">
 					<div>
-						<h3 class="mb-3 font-semibold text-academic-gray-800">Room Link</h3>
-						<p class="mb-2 text-sm text-academic-gray-600">You can share this room link with others:</p>
+						<h3 class="text-academic-gray-800 mb-3 font-semibold">Room Link</h3>
+						<p class="text-academic-gray-600 mb-2 text-sm">
+							You can share this room link with others:
+						</p>
 						<div class="flex gap-2">
 							<input
 								type="text"
 								value={`${window.location.origin}/editor/${roomId}`}
 								readonly
-								class="flex-1 rounded border border-academic-gray-300 bg-academic-gray-50 px-3 py-2 text-sm text-academic-gray-700"
+								class="border-academic-gray-300 bg-academic-gray-50 text-academic-gray-700 flex-1 rounded border px-3 py-2 text-sm"
 							/>
 							<Button size="sm" on:click={copyPublicLink}>Copy</Button>
 						</div>
@@ -209,18 +219,18 @@
 				<div class="space-y-6">
 					<!-- Share with specific user -->
 					<div>
-						<h3 class="mb-3 font-semibold text-academic-gray-800">Share with user</h3>
+						<h3 class="text-academic-gray-800 mb-3 font-semibold">Share with user</h3>
 						<form on:submit|preventDefault={shareWithUser} class="flex gap-2">
 							<input
 								type="text"
 								bind:value={shareUsername}
 								placeholder="Username"
-								class="flex-1 rounded border border-academic-gray-300 px-3 py-2 focus:ring-2 focus:ring-academic-primary focus:border-academic-primary focus:outline-none transition-colors duration-200"
+								class="border-academic-gray-300 focus:ring-academic-primary focus:border-academic-primary flex-1 rounded border px-3 py-2 transition-colors duration-200 focus:ring-2 focus:outline-none"
 								disabled={sharing}
 							/>
 							<select
 								bind:value={sharePermission}
-								class="rounded border border-academic-gray-300 px-3 py-2 focus:ring-2 focus:ring-academic-primary focus:border-academic-primary focus:outline-none transition-colors duration-200"
+								class="border-academic-gray-300 focus:ring-academic-primary focus:border-academic-primary rounded border px-3 py-2 transition-colors duration-200 focus:ring-2 focus:outline-none"
 								disabled={sharing}
 							>
 								<option value="view">View</option>
@@ -232,11 +242,11 @@
 
 					<!-- Public link -->
 					<div>
-						<h3 class="mb-3 font-semibold text-academic-gray-800">Public link</h3>
+						<h3 class="text-academic-gray-800 mb-3 font-semibold">Public link</h3>
 						{#if shares.some((s) => s.isPublic)}
-							<div class="rounded bg-academic-gray-50 border border-academic-gray-200 p-3">
+							<div class="bg-academic-gray-50 border-academic-gray-200 rounded border p-3">
 								<div class="mb-2 flex items-center justify-between">
-									<span class="text-sm text-academic-gray-700">
+									<span class="text-academic-gray-700 text-sm">
 										Anyone with the link can {shares.find((s) => s.isPublic)?.permission}
 									</span>
 									<button
@@ -244,7 +254,7 @@
 											const publicShare = shares.find((s) => s.isPublic);
 											if (publicShare) removeShare(publicShare.id);
 										}}
-										class="text-sm text-academic-error hover:underline transition-colors duration-200"
+										class="text-academic-error text-sm transition-colors duration-200 hover:underline"
 									>
 										Remove
 									</button>
@@ -254,7 +264,7 @@
 										type="text"
 										value={`${window.location.origin}/editor/${roomId}`}
 										readonly
-										class="flex-1 rounded border border-academic-gray-300 bg-academic-paper px-3 py-2 text-sm text-academic-gray-700"
+										class="border-academic-gray-300 bg-academic-paper text-academic-gray-700 flex-1 rounded border px-3 py-2 text-sm"
 									/>
 									<Button size="sm" on:click={copyPublicLink}>Copy</Button>
 								</div>
@@ -263,7 +273,7 @@
 							<div class="flex gap-2">
 								<select
 									bind:value={publicLinkPermission}
-									class="rounded border border-academic-gray-300 px-3 py-2 focus:ring-2 focus:ring-academic-primary focus:border-academic-primary focus:outline-none transition-colors duration-200"
+									class="border-academic-gray-300 focus:ring-academic-primary focus:border-academic-primary rounded border px-3 py-2 transition-colors duration-200 focus:ring-2 focus:outline-none"
 									disabled={sharing}
 								>
 									<option value="view">View only</option>
@@ -279,17 +289,19 @@
 						<p class="text-academic-gray-500">Loading shares...</p>
 					{:else if shares.filter((s) => !s.isPublic).length > 0}
 						<div>
-							<h3 class="mb-3 font-semibold text-academic-gray-800">Shared with</h3>
+							<h3 class="text-academic-gray-800 mb-3 font-semibold">Shared with</h3>
 							<div class="space-y-2">
 								{#each shares.filter((s) => !s.isPublic) as share}
-									<div class="flex items-center justify-between rounded bg-academic-gray-50 border border-academic-gray-200 p-3">
+									<div
+										class="bg-academic-gray-50 border-academic-gray-200 flex items-center justify-between rounded border p-3"
+									>
 										<div>
-											<span class="font-medium text-academic-gray-900">{share.username}</span>
-											<span class="ml-2 text-sm text-academic-gray-600">({share.permission})</span>
+											<span class="text-academic-gray-900 font-medium">{share.username}</span>
+											<span class="text-academic-gray-600 ml-2 text-sm">({share.permission})</span>
 										</div>
 										<button
 											on:click={() => removeShare(share.id)}
-											class="text-sm text-academic-error hover:underline transition-colors duration-200"
+											class="text-academic-error text-sm transition-colors duration-200 hover:underline"
 										>
 											Remove
 										</button>

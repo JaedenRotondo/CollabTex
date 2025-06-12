@@ -197,26 +197,28 @@
 </script>
 
 <div class="bg-academic-sidebar flex h-full flex-col">
-	<div class="flex items-center justify-between border-b border-academic-border bg-academic-gray-50 px-4 py-3">
-		<h3 class="text-sm font-semibold text-academic-gray-800">Files</h3>
+	<div
+		class="border-academic-border bg-academic-gray-50 flex items-center justify-between border-b px-4 py-3"
+	>
+		<h3 class="text-academic-gray-800 text-sm font-semibold">Files</h3>
 		<div class="flex gap-1">
 			<button
 				on:click={() => dispatch('import')}
-				class="rounded p-1.5 hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 transition-colors duration-200"
+				class="hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 rounded p-1.5 transition-colors duration-200"
 				title="Import files"
 			>
 				<Upload size={16} />
 			</button>
 			<button
 				on:click={() => handleShowNewItemDialog('folder')}
-				class="rounded p-1.5 hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 transition-colors duration-200"
+				class="hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 rounded p-1.5 transition-colors duration-200"
 				title="New folder"
 			>
 				<FolderPlus size={16} />
 			</button>
 			<button
 				on:click={() => handleShowNewItemDialog('file')}
-				class="rounded p-1.5 hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 transition-colors duration-200"
+				class="hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 rounded p-1.5 transition-colors duration-200"
 				title="New file"
 			>
 				<Plus size={16} />
@@ -249,13 +251,13 @@
 <!-- New File Dialog -->
 {#if showNewFileDialog}
 	<div class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
-		<div class="w-80 rounded bg-academic-paper border border-academic-border p-4 shadow-lg">
-			<h3 class="mb-4 font-semibold text-academic-gray-900">New File</h3>
+		<div class="bg-academic-paper border-academic-border w-80 rounded border p-4 shadow-lg">
+			<h3 class="text-academic-gray-900 mb-4 font-semibold">New File</h3>
 			<input
 				type="text"
 				bind:value={newItemName}
 				placeholder="filename.tex"
-				class="mb-4 w-full rounded border border-academic-gray-300 px-3 py-2 focus:ring-2 focus:ring-academic-primary focus:border-academic-primary focus:outline-none transition-colors duration-200"
+				class="border-academic-gray-300 focus:ring-academic-primary focus:border-academic-primary mb-4 w-full rounded border px-3 py-2 transition-colors duration-200 focus:ring-2 focus:outline-none"
 				on:keydown={(e) => {
 					if (e.key === 'Enter') createNewItem('file');
 					if (e.key === 'Escape') showNewFileDialog = false;
@@ -264,13 +266,13 @@
 			<div class="flex justify-end gap-2">
 				<button
 					on:click={() => (showNewFileDialog = false)}
-					class="rounded px-3 py-1 text-academic-gray-700 hover:bg-academic-gray-100 transition-colors duration-200"
+					class="text-academic-gray-700 hover:bg-academic-gray-100 rounded px-3 py-1 transition-colors duration-200"
 				>
 					Cancel
 				</button>
 				<button
 					on:click={() => createNewItem('file')}
-					class="rounded bg-academic-primary px-3 py-1 text-white hover:bg-academic-primary-dark transition-colors duration-200"
+					class="bg-academic-primary hover:bg-academic-primary-dark rounded px-3 py-1 text-white transition-colors duration-200"
 				>
 					Create
 				</button>
@@ -282,13 +284,13 @@
 <!-- New Folder Dialog -->
 {#if showNewFolderDialog}
 	<div class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
-		<div class="w-80 rounded bg-academic-paper border border-academic-border p-4 shadow-lg">
-			<h3 class="mb-4 font-semibold text-academic-gray-900">New Folder</h3>
+		<div class="bg-academic-paper border-academic-border w-80 rounded border p-4 shadow-lg">
+			<h3 class="text-academic-gray-900 mb-4 font-semibold">New Folder</h3>
 			<input
 				type="text"
 				bind:value={newItemName}
 				placeholder="folder name"
-				class="mb-4 w-full rounded border border-academic-gray-300 px-3 py-2 focus:ring-2 focus:ring-academic-primary focus:border-academic-primary focus:outline-none transition-colors duration-200"
+				class="border-academic-gray-300 focus:ring-academic-primary focus:border-academic-primary mb-4 w-full rounded border px-3 py-2 transition-colors duration-200 focus:ring-2 focus:outline-none"
 				on:keydown={(e) => {
 					if (e.key === 'Enter') createNewItem('folder');
 					if (e.key === 'Escape') showNewFolderDialog = false;
@@ -297,13 +299,13 @@
 			<div class="flex justify-end gap-2">
 				<button
 					on:click={() => (showNewFolderDialog = false)}
-					class="rounded px-3 py-1 text-academic-gray-700 hover:bg-academic-gray-100 transition-colors duration-200"
+					class="text-academic-gray-700 hover:bg-academic-gray-100 rounded px-3 py-1 transition-colors duration-200"
 				>
 					Cancel
 				</button>
 				<button
 					on:click={() => createNewItem('folder')}
-					class="rounded bg-academic-primary px-3 py-1 text-white hover:bg-academic-primary-dark transition-colors duration-200"
+					class="bg-academic-primary hover:bg-academic-primary-dark rounded px-3 py-1 text-white transition-colors duration-200"
 				>
 					Create
 				</button>

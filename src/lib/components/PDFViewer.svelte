@@ -60,7 +60,7 @@
 			pdfDoc = await loadingTask.promise;
 			numPages = pdfDoc.numPages;
 			pageNum = 1;
-			
+
 			// Initial render
 			await renderPage(pageNum);
 		} catch (error) {
@@ -161,24 +161,26 @@
 	}
 </script>
 
-<div class="flex h-full flex-col bg-academic-gray-50">
+<div class="bg-academic-gray-50 flex h-full flex-col">
 	{#if pdfData}
-		<div class="flex items-center justify-between border-b border-academic-border bg-academic-paper px-4 py-3 shadow-sm">
+		<div
+			class="border-academic-border bg-academic-paper flex items-center justify-between border-b px-4 py-3 shadow-sm"
+		>
 			<div class="flex items-center gap-3">
 				<button
 					on:click={onPrevPage}
 					disabled={pageNum <= 1}
-					class="rounded bg-academic-gray-100 px-3 py-1.5 text-sm text-academic-gray-700 hover:bg-academic-gray-200 disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-200"
+					class="bg-academic-gray-100 text-academic-gray-700 hover:bg-academic-gray-200 rounded px-3 py-1.5 text-sm transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
 				>
 					Previous
 				</button>
-				<span class="text-sm text-academic-gray-600 font-medium">
+				<span class="text-academic-gray-600 text-sm font-medium">
 					Page {pageNum} of {numPages}
 				</span>
 				<button
 					on:click={onNextPage}
 					disabled={pageNum >= numPages}
-					class="rounded bg-academic-gray-100 px-3 py-1.5 text-sm text-academic-gray-700 hover:bg-academic-gray-200 disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-200"
+					class="bg-academic-gray-100 text-academic-gray-700 hover:bg-academic-gray-200 rounded px-3 py-1.5 text-sm transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
 				>
 					Next
 				</button>
@@ -187,22 +189,24 @@
 			<div class="flex items-center gap-2">
 				<button
 					on:click={zoomOut}
-					class="rounded bg-academic-gray-100 px-3 py-1.5 text-sm text-academic-gray-700 hover:bg-academic-gray-200 transition-colors duration-200"
+					class="bg-academic-gray-100 text-academic-gray-700 hover:bg-academic-gray-200 rounded px-3 py-1.5 text-sm transition-colors duration-200"
 					title="Zoom out"
 				>
 					−
 				</button>
-				<span class="text-sm text-academic-gray-600 font-medium min-w-12 text-center">{Math.round(scale * 100)}%</span>
+				<span class="text-academic-gray-600 min-w-12 text-center text-sm font-medium"
+					>{Math.round(scale * 100)}%</span
+				>
 				<button
 					on:click={zoomIn}
-					class="rounded bg-academic-gray-100 px-3 py-1.5 text-sm text-academic-gray-700 hover:bg-academic-gray-200 transition-colors duration-200"
+					class="bg-academic-gray-100 text-academic-gray-700 hover:bg-academic-gray-200 rounded px-3 py-1.5 text-sm transition-colors duration-200"
 					title="Zoom in"
 				>
 					+
 				</button>
 				<button
 					on:click={fitToWidth}
-					class="rounded bg-academic-gray-100 px-3 py-1.5 text-sm text-academic-gray-700 hover:bg-academic-gray-200 transition-colors duration-200"
+					class="bg-academic-gray-100 text-academic-gray-700 hover:bg-academic-gray-200 rounded px-3 py-1.5 text-sm transition-colors duration-200"
 					title="Reset zoom to 100%"
 				>
 					Reset
@@ -210,7 +214,7 @@
 			</div>
 		</div>
 
-		<div class="flex-1 overflow-auto p-6 bg-academic-gray-50">
+		<div class="bg-academic-gray-50 flex-1 overflow-auto p-6">
 			<div class="relative mx-auto" style="width: fit-content">
 				<canvas bind:this={canvas} class="shadow-lg"></canvas>
 				<div bind:this={textLayer} class="textLayer absolute top-0 left-0"></div>

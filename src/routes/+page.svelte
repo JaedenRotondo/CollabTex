@@ -128,25 +128,29 @@
 </script>
 
 <div
-	class="flex min-h-screen items-center justify-center bg-gradient-to-b from-academic-gray-50 to-academic-gray-100 p-4"
+	class="from-academic-gray-50 to-academic-gray-100 flex min-h-screen items-center justify-center bg-gradient-to-b p-4"
 >
 	<div class="w-full max-w-md">
 		<!-- CollabTeX official logo centered -->
-		<div class="flex justify-center mb-6">
-			<img src="/collabtex-logo.png" alt="CollabTeX" class="h-32 w-32 opacity-90 hover:opacity-100 transition-opacity duration-200 rounded-lg shadow-lg bg-white" />
+		<div class="mb-6 flex justify-center">
+			<img
+				src="/collabtex-logo.png"
+				alt="CollabTeX"
+				class="h-32 w-32 rounded-lg bg-white opacity-90 shadow-lg transition-opacity duration-200 hover:opacity-100"
+			/>
 		</div>
 		<div class="mb-8 text-center">
-			<p class="text-lg text-academic-gray-600">Collaborative LaTeX editing in your browser</p>
+			<p class="text-academic-gray-600 text-lg">Collaborative LaTeX editing in your browser</p>
 		</div>
 
-		<div class="space-y-6 rounded-lg bg-academic-paper border border-academic-border p-6 shadow-lg">
+		<div class="bg-academic-paper border-academic-border space-y-6 rounded-lg border p-6 shadow-lg">
 			<div>
-				<h2 class="mb-4 text-xl font-semibold text-academic-gray-800">Start a new document</h2>
+				<h2 class="text-academic-gray-800 mb-4 text-xl font-semibold">Start a new document</h2>
 				<div class="space-y-3">
 					<Button
 						on:click={createNewRoom}
 						size="lg"
-						class="bg-academic-primary hover:bg-academic-primary-dark text-white w-full"
+						class="bg-academic-primary hover:bg-academic-primary-dark w-full text-white"
 					>
 						Create New Room
 					</Button>
@@ -199,12 +203,12 @@
 					<div class="w-full border-t border-gray-300"></div>
 				</div>
 				<div class="relative flex justify-center text-sm">
-					<span class="bg-academic-paper px-2 text-academic-gray-500">Or</span>
+					<span class="bg-academic-paper text-academic-gray-500 px-2">Or</span>
 				</div>
 			</div>
 
 			<div>
-				<h2 class="mb-4 text-xl font-semibold text-academic-gray-800">Join existing room</h2>
+				<h2 class="text-academic-gray-800 mb-4 text-xl font-semibold">Join existing room</h2>
 				<form on:submit|preventDefault={joinRoom} class="space-y-4">
 					<input
 						type="text"
@@ -225,13 +229,13 @@
 			</div>
 		</div>
 
-		<div class="mt-8 text-center text-sm text-academic-gray-600">
+		<div class="text-academic-gray-600 mt-8 text-center text-sm">
 			<p>Powered by YJS for real-time collaboration</p>
 			<p class="mt-2">LaTeX compilation happens entirely in your browser</p>
 		</div>
 
 		<div class="mt-6 text-center">
-			<p class="text-sm text-academic-gray-600">
+			<p class="text-academic-gray-600 text-sm">
 				Want to save your projects?
 				<a href="/demo/lucia/login" class="text-academic-primary font-medium hover:underline">
 					Login / Register

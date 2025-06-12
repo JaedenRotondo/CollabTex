@@ -162,7 +162,9 @@
 	}
 </script>
 
-<div class="bg-academic-toolbar border-b border-academic-border px-4 py-3 shadow-sm flex items-center justify-between">
+<div
+	class="bg-academic-toolbar border-academic-border flex items-center justify-between border-b px-4 py-3 shadow-sm"
+>
 	<div class="flex items-center gap-3">
 		<Button
 			variant="outline"
@@ -174,14 +176,14 @@
 			<Home size={16} />
 		</Button>
 
-		<div class="h-6 w-px bg-academic-gray-300"></div>
+		<div class="bg-academic-gray-300 h-6 w-px"></div>
 
 		<Button
 			variant="default"
 			size="sm"
 			on:click={handleCompile}
 			disabled={compiling}
-			class="bg-academic-primary hover:bg-academic-primary-dark text-white font-medium px-4 py-2 shadow-sm transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+			class="bg-academic-primary hover:bg-academic-primary-dark px-4 py-2 font-medium text-white shadow-sm transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
 		>
 			{#if compiling}
 				<span class="mr-2 animate-spin">⟳</span>
@@ -192,23 +194,26 @@
 		</Button>
 
 		{#if lastCompileStatus === 'success'}
-			<div class="flex items-center gap-1.5 text-academic-success bg-academic-primary-light px-3 py-1.5 rounded-md">
+			<div
+				class="text-academic-success bg-academic-primary-light flex items-center gap-1.5 rounded-md px-3 py-1.5"
+			>
 				<CheckCircle size={16} />
 				<span class="text-sm font-medium">Success</span>
 			</div>
 		{:else if lastCompileStatus === 'error'}
 			<button
 				on:click={() => dispatch('toggleErrors')}
-				class="flex items-center gap-1.5 text-academic-error hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-200"
+				class="text-academic-error flex items-center gap-1.5 rounded-md bg-red-50 px-3 py-1.5 transition-colors duration-200 hover:bg-red-100 hover:text-red-700"
 			>
 				<AlertCircle size={16} />
-				<span class="text-sm font-medium">{errorCount} {errorCount === 1 ? 'error' : 'errors'}</span>
+				<span class="text-sm font-medium">{errorCount} {errorCount === 1 ? 'error' : 'errors'}</span
+				>
 			</button>
 		{/if}
 
-		<Button 
-			variant="outline" 
-			size="sm" 
+		<Button
+			variant="outline"
+			size="sm"
 			on:click={handleDownload}
 			class="border-academic-gray-300 text-academic-gray-700 hover:bg-academic-gray-50 hover:text-academic-gray-900 transition-colors duration-200"
 		>
@@ -239,26 +244,26 @@
 			<span class="text-academic-gray-700 text-sm font-semibold">CollabTeX</span>
 		</div>
 
-		<div class="flex items-center gap-1 border-l border-academic-gray-300 pl-4">
+		<div class="border-academic-gray-300 flex items-center gap-1 border-l pl-4">
 			<button
 				on:click={handleFoldAll}
-				class="rounded p-2 hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 transition-colors duration-200"
+				class="hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 rounded p-2 transition-colors duration-200"
 				title="Fold all sections"
 			>
 				<ChevronsUp size={16} />
 			</button>
 			<button
 				on:click={handleUnfoldAll}
-				class="rounded p-2 hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 transition-colors duration-200"
+				class="hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 rounded p-2 transition-colors duration-200"
 				title="Unfold all sections"
 			>
 				<ChevronsDown size={16} />
 			</button>
 		</div>
 
-		<Button 
-			variant="outline" 
-			size="sm" 
+		<Button
+			variant="outline"
+			size="sm"
 			on:click={handleShare}
 			class="border-academic-gray-300 text-academic-gray-700 hover:bg-academic-gray-50 hover:text-academic-gray-900 transition-colors duration-200"
 		>

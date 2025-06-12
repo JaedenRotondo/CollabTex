@@ -79,9 +79,9 @@
 		if (!file) {
 			console.warn('File not found:', fileId);
 			console.log('Available files:', Array.from(files.keys()));
-			
+
 			// Try to find a valid file and set it as active
-			const availableFiles = Array.from(files.values()).filter(f => f.type === 'file');
+			const availableFiles = Array.from(files.values()).filter((f) => f.type === 'file');
 			if (availableFiles.length > 0) {
 				console.log('Setting first available file as active:', availableFiles[0].id);
 				activeFile.set('id', { id: availableFiles[0].id });
@@ -145,13 +145,15 @@
 				backgroundColor: '#FFFFFF'
 			},
 			'.cm-content': {
-				fontFamily: '"JetBrains Mono", "Fira Code", Monaco, Menlo, "Ubuntu Mono", Consolas, monospace',
+				fontFamily:
+					'"JetBrains Mono", "Fira Code", Monaco, Menlo, "Ubuntu Mono", Consolas, monospace',
 				padding: '20px',
 				lineHeight: '1.6',
 				color: '#2C2C2C'
 			},
 			'.cm-scroller': {
-				fontFamily: '"JetBrains Mono", "Fira Code", Monaco, Menlo, "Ubuntu Mono", Consolas, monospace'
+				fontFamily:
+					'"JetBrains Mono", "Fira Code", Monaco, Menlo, "Ubuntu Mono", Consolas, monospace'
 			},
 			'.cm-focused .cm-cursor': {
 				borderLeftColor: '#138A36'

@@ -42,9 +42,7 @@ export function initializeCollaboration(roomId: string): CollaborationInstance {
 		signaling: [config.signaling.url],
 		maxConns: 20,
 		filterBcConns: true,
-		peerOpts: {},
-		// Reduce reconnection attempts
-		signalReconnectTimeout: 30000
+		peerOpts: {}
 	});
 
 	console.log('Setting user awareness...');
@@ -102,7 +100,8 @@ Start writing your LaTeX document here...
 	};
 
 	// File synchronization with database
-	const fileSync = new FileSync(files, roomId, ydoc, createDefaultContent);
+	const mainContent = ydoc.getText('main-content');
+	const fileSync = new FileSync(mainContent, roomId, createDefaultContent);
 
 	// Load files from database if user is authenticated
 	if (typeof window !== 'undefined') {

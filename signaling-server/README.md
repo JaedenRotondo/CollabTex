@@ -14,6 +14,7 @@ Secure WebRTC signaling server for CollabTex collaborative LaTeX editor.
 1. Create a new Web Service on Render
 2. Connect your GitHub repository
 3. Set the following:
+
    - **Build Command**: `npm install`
    - **Start Command**: `npm start`
    - **Environment**: Node

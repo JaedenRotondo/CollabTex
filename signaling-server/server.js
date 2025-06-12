@@ -16,69 +16,69 @@ const rateLimitStore = new Map();
 
 // Clean up rate limit store periodically
 setInterval(() => {
-  const now = Date.now();
-  for (const [key, data] of rateLimitStore.entries()) {
-    if (now - data.windowStart > RATE_LIMIT_WINDOW) {
-      rateLimitStore.delete(key);
-    }
-  }
+	const now = Date.now();
+	for (const [key, data] of rateLimitStore.entries()) {
+		if (now - data.windowStart > RATE_LIMIT_WINDOW) {
+			rateLimitStore.delete(key);
+		}
+	}
 }, RATE_LIMIT_WINDOW);
 
 // Create WebSocket server
 const wss = new WebSocketServer({
-  port: PORT,
-  verifyClient: (info, cb) => {
-    const { origin, req } = info;
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    
-    // Check rate limiting
-    const now = Date.now();
-    const rateLimitKey = ip;
-    const rateLimitData = rateLimitStore.get(rateLimitKey) || { windowStart: now, count: 0 };
-    
-    if (now - rateLimitData.windowStart > RATE_LIMIT_WINDOW) {
-      rateLimitData.windowStart = now;
-      rateLimitData.count = 0;
-    }
-    
-    rateLimitData.count++;
-    rateLimitStore.set(rateLimitKey, rateLimitData);
-    
-    if (rateLimitData.count > RATE_LIMIT_MAX) {
-      console.log(`Rate limit exceeded for IP: ${ip}`);
-      cb(false, 429, 'Too Many Requests');
-      return;
-    }
-    
-    // Check origin
-    if (!ALLOWED_ORIGINS.includes(origin) && !ALLOWED_ORIGINS.includes('*')) {
-      console.log(`Rejected connection from unauthorized origin: ${origin}`);
-      cb(false, 403, 'Forbidden');
-      return;
-    }
-    
-    // API key check removed - origin validation is sufficient
-    
-    // Connection allowed
-    console.log(`Accepted connection from ${origin} (IP: ${ip})`);
-    cb(true);
-  }
+	port: PORT,
+	verifyClient: (info, cb) => {
+		const { origin, req } = info;
+		const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+		// Check rate limiting
+		const now = Date.now();
+		const rateLimitKey = ip;
+		const rateLimitData = rateLimitStore.get(rateLimitKey) || { windowStart: now, count: 0 };
+
+		if (now - rateLimitData.windowStart > RATE_LIMIT_WINDOW) {
+			rateLimitData.windowStart = now;
+			rateLimitData.count = 0;
+		}
+
+		rateLimitData.count++;
+		rateLimitStore.set(rateLimitKey, rateLimitData);
+
+		if (rateLimitData.count > RATE_LIMIT_MAX) {
+			console.log(`Rate limit exceeded for IP: ${ip}`);
+			cb(false, 429, 'Too Many Requests');
+			return;
+		}
+
+		// Check origin
+		if (!ALLOWED_ORIGINS.includes(origin) && !ALLOWED_ORIGINS.includes('*')) {
+			console.log(`Rejected connection from unauthorized origin: ${origin}`);
+			cb(false, 403, 'Forbidden');
+			return;
+		}
+
+		// API key check removed - origin validation is sufficient
+
+		// Connection allowed
+		console.log(`Accepted connection from ${origin} (IP: ${ip})`);
+		cb(true);
+	}
 });
 
 wss.on('connection', (ws, req) => {
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  console.log(`WebSocket connected from IP: ${ip}`);
-  
-  // Set up YJS connection using y-websocket
-  setupWSConnection(ws, req);
-  
-  ws.on('close', () => {
-    console.log(`WebSocket disconnected from IP: ${ip}`);
-  });
-  
-  ws.on('error', (error) => {
-    console.error(`WebSocket error from IP ${ip}:`, error);
-  });
+	const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+	console.log(`WebSocket connected from IP: ${ip}`);
+
+	// Set up YJS connection using y-websocket
+	setupWSConnection(ws, req);
+
+	ws.on('close', () => {
+		console.log(`WebSocket disconnected from IP: ${ip}`);
+	});
+
+	ws.on('error', (error) => {
+		console.error(`WebSocket error from IP ${ip}:`, error);
+	});
 });
 
 console.log(`Signaling server running on port ${PORT}`);

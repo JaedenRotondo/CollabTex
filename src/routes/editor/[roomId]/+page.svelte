@@ -24,7 +24,7 @@
 	let showFileExplorer = true;
 	let pdfData: ArrayBuffer | null = null;
 	let compileErrors: CompileError[] = [];
-	
+
 	// Store PDF data outside of Svelte's reactivity to prevent ArrayBuffer detachment
 	let storedPdfData: ArrayBuffer | null = null;
 	let showErrors = false;
@@ -119,7 +119,7 @@
 	function handleDownload() {
 		// Use storedPdfData for download instead of reactive pdfData
 		const dataToDownload = storedPdfData;
-		
+
 		if (!dataToDownload) {
 			alert('No PDF available to download. Please compile first.');
 			return;
@@ -164,7 +164,6 @@
 		// File selection is handled by the FileExplorer component
 		// The active file is automatically synced via Yjs
 	}
-
 </script>
 
 <svelte:head>
@@ -190,7 +189,7 @@
 
 		<div class="flex flex-1 overflow-hidden">
 			{#if showFileExplorer}
-				<div class="w-64 border-r border-academic-border bg-academic-sidebar shadow-sm">
+				<div class="border-academic-border bg-academic-sidebar w-64 border-r shadow-sm">
 					{#if files && activeFile}
 						<FileExplorer
 							{files}
@@ -200,14 +199,14 @@
 						/>
 					{:else}
 						<div class="flex h-full items-center justify-center">
-							<p class="text-sm text-academic-gray-500">Loading files...</p>
+							<p class="text-academic-gray-500 text-sm">Loading files...</p>
 						</div>
 					{/if}
 				</div>
 			{/if}
 
 			<div class="flex flex-1">
-				<div class="flex-1 bg-academic-editor">
+				<div class="bg-academic-editor flex-1">
 					{#if files && activeFile}
 						<Editor bind:this={editorComponent} {ydoc} {provider} {files} {activeFile} />
 					{/if}
@@ -218,7 +217,7 @@
 					/>
 				</div>
 
-				<div class="flex-1 bg-academic-gray-50 shadow-inner">
+				<div class="bg-academic-gray-50 flex-1 shadow-inner">
 					<PDFViewer {pdfData} />
 				</div>
 			</div>

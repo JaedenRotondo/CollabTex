@@ -1,120 +1,79 @@
 import * as Y from 'yjs';
-import type { FileNode } from './yjs-setup';
 
 export class FileSync {
-	private files: Y.Map<FileNode>;
+	private fileContent: Y.Text;
 	private roomId: string;
-	private ydoc: Y.Doc;
 	private createDefaultContent: () => void;
 	private syncInterval: number | null = null;
-	private pendingChanges: Set<string> = new Set();
+	private contentChanged: boolean = false;
+	private fileExists: boolean = false;
 
-	constructor(
-		files: Y.Map<FileNode>,
-		roomId: string,
-		ydoc: Y.Doc,
-		createDefaultContent: () => void
-	) {
-		this.files = files;
+	constructor(fileContent: Y.Text, roomId: string, createDefaultContent: () => void) {
+		this.fileContent = fileContent;
 		this.roomId = roomId;
-		this.ydoc = ydoc;
 		this.createDefaultContent = createDefaultContent;
 		this.setupObservers();
 	}
 
 	private setupObservers() {
-		// Observe file changes
-		this.files.observe((event) => {
-			event.changes.keys.forEach((change, key) => {
-				if (change.action === 'add' || change.action === 'update') {
-					this.pendingChanges.add(key);
-				} else if (change.action === 'delete') {
-					this.pendingChanges.add(`delete:${key}`);
-				}
-			});
+		// Observe content changes
+		this.fileContent.observe(() => {
+			this.contentChanged = true;
 
 			// Debounce sync
 			if (this.syncInterval) {
 				clearTimeout(this.syncInterval);
 			}
 			this.syncInterval = window.setTimeout(() => {
-				this.syncChanges();
+				this.syncContent();
 			}, 1000);
 		});
 	}
 
-	private async syncChanges() {
-		if (this.pendingChanges.size === 0) return;
+	private async syncContent() {
+		if (!this.contentChanged) return;
 
-		const changes = Array.from(this.pendingChanges);
-		this.pendingChanges.clear();
-
-		for (const change of changes) {
-			if (change.startsWith('delete:')) {
-				const fileId = change.substring(7);
-				await this.deleteFileFromDB(fileId);
-			} else {
-				const file = this.files.get(change);
-				if (file) {
-					await this.syncFileToDB(file);
-				}
-			}
-		}
+		this.contentChanged = false;
+		const content = this.fileContent.toString();
+		await this.syncContentToDB(content);
 	}
 
-	private async syncFileToDB(file: FileNode) {
+	private async syncContentToDB(content: string) {
 		try {
-			const response = await fetch(`/api/projects/${this.roomId}/files`, {
-				method: 'PATCH',
+			const response = await fetch(`/api/projects/${this.roomId}/content`, {
+				method: this.fileExists ? 'PATCH' : 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({
-					fileId: file.id,
-					updates: {
-						name: file.name,
-						content: file.content,
-						parentId: file.parentId
-					}
-				})
+				body: JSON.stringify({ content })
 			});
 
 			if (!response.ok) {
-				console.error('Failed to sync file:', await response.text());
+				const errorText = await response.text();
+				console.error(`Failed to ${this.fileExists ? 'update' : 'create'} content:`, errorText);
+				throw new Error(`Failed to ${this.fileExists ? 'update' : 'create'} content: ${errorText}`);
+			}
+
+			if (!this.fileExists) {
+				this.fileExists = true;
 			}
 		} catch (error) {
-			console.error('Error syncing file:', error);
-		}
-	}
-
-	private async deleteFileFromDB(fileId: string) {
-		try {
-			const response = await fetch(`/api/projects/${this.roomId}/files`, {
-				method: 'DELETE',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ fileId })
-			});
-
-			if (!response.ok) {
-				console.error('Failed to delete file:', await response.text());
-			}
-		} catch (error) {
-			console.error('Error deleting file:', error);
+			console.error('Error syncing content:', error);
+			this.contentChanged = true;
+			throw error;
 		}
 	}
 
 	async loadFromDB() {
 		try {
-			console.log('Loading project from DB, roomId:', this.roomId);
-			const response = await fetch(`/api/projects/${this.roomId}`);
+			console.log('Loading project content from DB, roomId:', this.roomId);
+			const response = await fetch(`/api/projects/${this.roomId}/content`);
 			console.log('API response status:', response.status);
-			
+
 			if (!response.ok) {
 				const errorText = await response.text();
 				console.log('API error response:', errorText);
-				
+
 				if (response.status === 404) {
 					// Project doesn't exist in DB, check if we're authenticated
 					console.log('Project not found (404), checking authentication...');
@@ -143,45 +102,12 @@ export class FileSync {
 			}
 
 			const data = await response.json();
-			console.log('Successfully loaded project data:', data);
-			console.log('Files found:', data.files?.length || 0);
+			console.log('Successfully loaded project content:', data);
 
-			// Clear existing files and Y.Text documents
-			this.files.clear();
-
-			// Load files from database
-			for (const file of data.files) {
-				this.files.set(file.id, {
-					id: file.id,
-					name: file.name,
-					type: file.type,
-					parentId: file.parentId,
-					content: file.content || ''
-				});
-
-				// Initialize Y.Text for this file with database content
-				if (file.type === 'file') {
-					const fileYText = this.ydoc.getText(`file-${file.id}`);
-					if (fileYText.length === 0 && file.content) {
-						fileYText.insert(0, file.content);
-					}
-				}
-			}
-
-			// Set the first file as active if no active file is set, or if current active file doesn't exist
-			const activeFileMap = this.ydoc.getMap('activeFile');
-			const currentActiveFile = activeFileMap.get('id');
-			const currentActiveFileId = currentActiveFile && typeof currentActiveFile === 'object' && currentActiveFile.id ? currentActiveFile.id : null;
-			
-			// Check if current active file is valid
-			const isActiveFileValid = currentActiveFileId && data.files.some((f: { id: string; type: string }) => f.id === currentActiveFileId && f.type === 'file');
-			
-			if (data.files.length > 0 && (!currentActiveFileId || !isActiveFileValid)) {
-				const firstFile = data.files.find((f: { type: string }) => f.type === 'file');
-				if (firstFile) {
-					activeFileMap.set('id', { id: firstFile.id });
-					console.log('Set active file to:', firstFile.id, isActiveFileValid ? '(correcting invalid active file)' : '(no active file set)');
-				}
+			// Load content into Y.Text
+			if (data.content && this.fileContent.length === 0) {
+				this.fileContent.insert(0, data.content);
+				this.fileExists = true;
 			}
 		} catch (error) {
 			console.error('Error loading from database:', error);
@@ -208,34 +134,10 @@ export class FileSync {
 
 			const data = await response.json();
 
-			// Clear existing files
-			this.files.clear();
-
-			// Load the created files
-			for (const file of data.files) {
-				this.files.set(file.id, {
-					id: file.id,
-					name: file.name,
-					type: file.type,
-					parentId: file.parentId,
-					content: file.content || ''
-				});
-
-				// Initialize Y.Text for this file with database content
-				if (file.type === 'file') {
-					const fileYText = this.ydoc.getText(`file-${file.id}`);
-					if (fileYText.length === 0 && file.content) {
-						fileYText.insert(0, file.content);
-					}
-				}
-			}
-
-			// Set the first file as active
-			const firstFile = data.files.find((f: { type: string }) => f.type === 'file');
-			if (firstFile) {
-				const activeFileMap = this.ydoc.getMap('activeFile');
-				activeFileMap.set('id', { id: firstFile.id });
-				console.log('Set active file to:', firstFile.id);
+			// Load initial content if available
+			if (data.content && this.fileContent.length === 0) {
+				this.fileContent.insert(0, data.content);
+				this.fileExists = true;
 			}
 		} catch (error) {
 			console.error('Error creating project:', error);
