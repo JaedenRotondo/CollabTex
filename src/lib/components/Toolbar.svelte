@@ -16,7 +16,7 @@
 	} from 'lucide-svelte';
 
 	export let ydoc: Y.Doc;
-	export let activeFile: Y.Map<{ id: string }>;
+	export let mainContent: Y.Text;
 
 	const dispatch = createEventDispatcher();
 	let compiling = false;
@@ -36,18 +36,8 @@
 		compiling = true;
 		lastCompileStatus = null;
 		try {
-			let content = '';
-
-			// Get content from active file
-			const activeData = activeFile?.get('id');
-			const activeFileId = typeof activeData === 'object' && activeData?.id ? activeData.id : null;
-			if (activeFileId) {
-				const ytext = ydoc.getText(`file-${activeFileId}`);
-				content = ytext.toString();
-			} else {
-				// Fallback to legacy content
-				content = ydoc.getText('latex-content').toString();
-			}
+			// Get content from main content
+			const content = mainContent.toString();
 
 			const result = await compileLatex(content);
 

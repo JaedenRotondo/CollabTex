@@ -17,8 +17,7 @@
 
 	let ydoc: Y.Doc | undefined;
 	let provider: WebrtcProvider | undefined;
-	let files: Y.Map<FileNode> | undefined;
-	let activeFile: Y.Map<{ id: string }> | undefined;
+	let mainContent: Y.Text | undefined;
 	let fileSync: FileSync | undefined;
 	let roomId = $page.params.roomId;
 	let showFileExplorer = true;
@@ -45,8 +44,7 @@
 			const collab = initializeCollaboration(roomId);
 			ydoc = collab.ydoc;
 			provider = collab.provider;
-			files = collab.files;
-			activeFile = collab.activeFile;
+			mainContent = collab.mainContent;
 			fileSync = collab.fileSync;
 
 			console.log('Collaboration initialized successfully');
@@ -172,7 +170,7 @@
 
 {#if ydoc && provider}
 	<div class="bg-academic-paper flex h-screen flex-col">
-		{#if activeFile}
+		{#if mainContent}
 			<Toolbar
 				on:compile={handleCompile}
 				on:toggleErrors={handleToggleErrors}
@@ -183,32 +181,17 @@
 				on:foldAll={() => editorComponent?.foldAllSections()}
 				on:unfoldAll={() => editorComponent?.unfoldAllSections()}
 				{ydoc}
-				{activeFile}
+				{mainContent}
 			/>
 		{/if}
 
 		<div class="flex flex-1 overflow-hidden">
-			{#if showFileExplorer}
-				<div class="border-academic-border bg-academic-sidebar w-64 border-r shadow-sm">
-					{#if files && activeFile}
-						<FileExplorer
-							{files}
-							{activeFile}
-							on:fileSelect={handleFileSelect}
-							on:import={() => document.getElementById('toolbar-import')?.click()}
-						/>
-					{:else}
-						<div class="flex h-full items-center justify-center">
-							<p class="text-academic-gray-500 text-sm">Loading files...</p>
-						</div>
-					{/if}
-				</div>
-			{/if}
+			<!-- FileExplorer disabled for single-file mode -->
 
 			<div class="flex flex-1">
 				<div class="bg-academic-editor flex-1">
-					{#if files && activeFile}
-						<Editor bind:this={editorComponent} {ydoc} {provider} {files} {activeFile} />
+					{#if ydoc && provider && mainContent}
+						<Editor bind:this={editorComponent} {ydoc} {provider} {mainContent} />
 					{/if}
 					<CompileErrors
 						errors={compileErrors}

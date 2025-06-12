@@ -9,7 +9,9 @@
 			viewport: { width: number; height: number };
 			transform?: number[];
 		}): { promise: Promise<void> };
-		getTextContent(): Promise<{ items: Array<{ str: string; transform: number[] }> }>;
+		getTextContent(): Promise<{
+			items: Array<{ str?: string; transform?: number[] } | { type?: string; id?: string }>;
+		}>;
 	}
 
 	interface PDFDocumentProxy {
@@ -57,9 +59,14 @@
 
 			currentPdfData = data;
 			const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(data) });
-			pdfDoc = await loadingTask.promise;
-			numPages = pdfDoc.numPages;
-			pageNum = 1;
+			const doc = await loadingTask.promise;
+			if (doc) {
+				pdfDoc = doc;
+				numPages = doc.numPages;
+				pageNum = 1;
+			} else {
+				throw new Error('Failed to load PDF document');
+			}
 
 			// Initial render
 			await renderPage(pageNum);

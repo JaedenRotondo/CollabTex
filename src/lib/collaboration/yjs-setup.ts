@@ -17,8 +17,7 @@ export interface CollaborationInstance {
 	provider: WebrtcProvider;
 	persistence: IndexeddbPersistence;
 	awareness: WebrtcProvider['awareness'];
-	files: Y.Map<FileNode>;
-	activeFile: Y.Map<{ id: string }>;
+	mainContent: Y.Text;
 	fileSync: FileSync;
 	createDefaultContent: () => void;
 }
@@ -29,11 +28,7 @@ export function initializeCollaboration(roomId: string): CollaborationInstance {
 	const ydoc = new Y.Doc();
 
 	// Initialize the main text content
-	const ytext = ydoc.getText('latex-content');
-
-	// Initialize file system
-	const files = ydoc.getMap<FileNode>('files');
-	const activeFile = ydoc.getMap<{ id: string }>('activeFile');
+	const mainContent = ydoc.getText('main-content');
 
 	console.log('Creating WebRTC provider...');
 
@@ -61,8 +56,7 @@ export function initializeCollaboration(roomId: string): CollaborationInstance {
 
 	// Function to create default content when needed
 	const createDefaultContent = () => {
-		if (files.size === 0) {
-			const mainFileId = 'main-tex';
+		if (mainContent.length === 0) {
 			const defaultContent = `\\documentclass{article}
 \\usepackage{graphicx}
 \\usepackage{amsmath}
@@ -80,27 +74,12 @@ Start writing your LaTeX document here...
 
 \\end{document}`;
 
-			files.set(mainFileId, {
-				id: mainFileId,
-				name: 'main.tex',
-				type: 'file',
-				parentId: null,
-				content: defaultContent
-			});
-
-			// Set as active file
-			activeFile.set('id', { id: mainFileId });
-
-			// Initialize the Y.Text content for this file
-			const fileYText = ydoc.getText(`file-${mainFileId}`);
-			if (fileYText.length === 0) {
-				fileYText.insert(0, defaultContent);
-			}
+			// Initialize the Y.Text content
+			mainContent.insert(0, defaultContent);
 		}
 	};
 
 	// File synchronization with database
-	const mainContent = ydoc.getText('main-content');
 	const fileSync = new FileSync(mainContent, roomId, createDefaultContent);
 
 	// Load files from database if user is authenticated
@@ -115,8 +94,7 @@ Start writing your LaTeX document here...
 		provider,
 		persistence,
 		awareness: provider.awareness,
-		files,
-		activeFile,
+		mainContent,
 		fileSync,
 		createDefaultContent
 	};
