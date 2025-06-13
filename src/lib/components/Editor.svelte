@@ -35,10 +35,7 @@
 	}
 
 	function initializeEditor() {
-		console.log('Initializing CodeMirror editor...');
-
 		if (!ydoc || !provider || !mainContent) {
-			console.warn('Editor: ydoc, provider, or mainContent not ready');
 			return;
 		}
 
@@ -68,8 +65,6 @@
 			state,
 			parent: editorContainer
 		});
-
-		console.log('CodeMirror editor initialized');
 	}
 
 	function createTheme() {
@@ -114,13 +109,11 @@
 	export function foldAllSections() {
 		if (!view) return;
 		// Simple folding implementation - this can be improved later
-		console.log('Fold all sections requested');
 	}
 
 	export function unfoldAllSections() {
 		if (!view) return;
 		// Simple unfolding implementation - this can be improved later
-		console.log('Unfold all sections requested');
 	}
 
 	onDestroy(() => {

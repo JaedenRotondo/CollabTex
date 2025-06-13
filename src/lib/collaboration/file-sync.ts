@@ -50,7 +50,6 @@ export class FileSync {
 
 			if (!response.ok) {
 				const errorText = await response.text();
-				console.error(`Failed to ${this.fileExists ? 'update' : 'create'} content:`, errorText);
 				throw new Error(`Failed to ${this.fileExists ? 'update' : 'create'} content: ${errorText}`);
 			}
 
@@ -58,7 +57,6 @@ export class FileSync {
 				this.fileExists = true;
 			}
 		} catch (error) {
-			console.error('Error syncing content:', error);
 			this.contentChanged = true;
 			throw error;
 		}
@@ -66,34 +64,26 @@ export class FileSync {
 
 	async loadFromDB() {
 		try {
-			console.log('Loading project content from DB, roomId:', this.roomId);
 			const response = await fetch(`/api/projects/${this.roomId}/content`);
-			console.log('API response status:', response.status);
 
 			if (!response.ok) {
 				const errorText = await response.text();
-				console.log('API error response:', errorText);
 
 				if (response.status === 404) {
 					// Project doesn't exist in DB, check if we're authenticated
-					console.log('Project not found (404), checking authentication...');
 					const authCheck = await fetch('/api/projects');
 					if (authCheck.ok) {
 						// User is authenticated, create project in DB
-						console.log('User is authenticated, creating new project');
 						await this.createProject();
 					} else {
 						// User is not authenticated, create default content
-						console.log('User not authenticated, creating default content');
 						this.createDefaultContent();
 					}
 				} else if (response.status === 401) {
 					// User is not authenticated and project is not publicly shared
-					console.log('Project not publicly accessible (401), creating default content');
 					this.createDefaultContent();
 				} else if (response.status === 403) {
 					// User is authenticated but doesn't have access
-					console.log('Access denied to project (403), creating default content');
 					this.createDefaultContent();
 				} else {
 					throw new Error(`Failed to load project: ${response.status} ${errorText}`);
@@ -102,15 +92,13 @@ export class FileSync {
 			}
 
 			const data = await response.json();
-			console.log('Successfully loaded project content:', data);
 
 			// Load content into Y.Text
 			if (data.content && this.fileContent.length === 0) {
 				this.fileContent.insert(0, data.content);
 				this.fileExists = true;
 			}
-		} catch (error) {
-			console.error('Error loading from database:', error);
+		} catch {
 			// If there's an error, create default content
 			this.createDefaultContent();
 		}
@@ -139,8 +127,8 @@ export class FileSync {
 				this.fileContent.insert(0, data.content);
 				this.fileExists = true;
 			}
-		} catch (error) {
-			console.error('Error creating project:', error);
+		} catch {
+			// Error creating project
 		}
 	}
 

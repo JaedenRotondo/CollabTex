@@ -25,18 +25,12 @@ export interface CollaborationInstance {
 }
 
 export function initializeCollaboration(roomId: string): CollaborationInstance {
-	console.log('Creating YJS document for room:', roomId);
-	console.log('Using signaling server:', config.signaling.url);
-
 	const ydoc = new Y.Doc();
 
 	// Initialize the main text content
 	const mainContent = ydoc.getText('main-content');
 
-	console.log('Creating WebRTC provider...');
-
 	// WebRTC provider for P2P collaboration
-	console.log('Creating WebRTC provider with roomId:', roomId);
 	const provider = new WebrtcProvider(roomId, ydoc, {
 		signaling: [config.signaling.url],
 		maxConns: 20,
@@ -50,10 +44,6 @@ export function initializeCollaboration(roomId: string): CollaborationInstance {
 			}
 		}
 	});
-	
-	console.log('WebRTC provider created, roomId:', provider.roomName);
-
-	console.log('Setting user awareness...');
 
 	// Set user awareness (will be updated later with real user info)
 	const userName = `User ${Math.floor(Math.random() * 100)}`;
@@ -62,72 +52,11 @@ export function initializeCollaboration(roomId: string): CollaborationInstance {
 		color: getRandomColor(),
 		colorLight: getRandomLightColor()
 	});
-	
-	console.log('Set local user awareness:', userName);
-
-	// Add connection event listeners for debugging
-	provider.on('status', (event: any) => {
-		console.log('WebRTC Provider status changed:', event);
-	});
-
-	provider.on('peers', (event: any) => {
-		console.log('WebRTC Provider peers changed:', {
-			added: event.added,
-			removed: event.removed,
-			webrtcPeers: event.webrtcPeers,
-			bcPeers: event.bcPeers,
-			totalPeers: (event.webrtcPeers || []).length + (event.bcPeers || []).length
-		});
-	});
-
-	provider.on('synced', (event: any) => {
-		console.log('WebRTC Provider sync status:', event);
-	});
-
-	// Add signaling connection debugging
-	provider.signalingConns.forEach((conn, i) => {
-		console.log(`Signaling connection ${i}:`, conn.url);
-		conn.on('connect', () => console.log(`Signaling ${i} connected`));
-		conn.on('disconnect', () => console.log(`Signaling ${i} disconnected`)); 
-		conn.on('error', (error: any) => console.log(`Signaling ${i} error:`, error));
-	});
 
 	// Create WebSocket provider as fallback
-	console.log('Creating WebSocket provider as fallback...');
 	const wsProvider = new WebsocketProvider(config.signaling.url, roomId, ydoc, {
-		awareness: provider.awareness // Share the same awareness
+		awareness: provider.awareness
 	});
-	
-	wsProvider.on('status', (event: any) => {
-		console.log('WebSocket Provider status:', event);
-	});
-	
-	wsProvider.on('sync', (isSynced: boolean) => {
-		console.log('WebSocket Provider synced:', isSynced);
-	});
-
-	// Add awareness debugging
-	provider.awareness.on('change', (changes: any) => {
-		const states = provider.awareness.getStates();
-		console.log('Awareness changed:', {
-			added: changes.added,
-			updated: changes.updated, 
-			removed: changes.removed,
-			totalStates: states.size,
-			allUsers: Array.from(states.values()).map(state => state.user?.name).filter(Boolean)
-		});
-	});
-
-	// Also log initial awareness state
-	setTimeout(() => {
-		const states = provider.awareness.getStates();
-		console.log('Initial awareness state:', {
-			totalStates: states.size,
-			allUsers: Array.from(states.values()).map(state => state.user?.name).filter(Boolean)
-		});
-	}, 1000);
-
-	console.log('Creating IndexedDB persistence...');
 
 	// IndexedDB persistence for offline support
 	const persistence = new IndexeddbPersistence(roomId, ydoc);
@@ -162,10 +91,8 @@ Start writing your LaTeX document here...
 
 	// Load files from database if user is authenticated
 	if (typeof window !== 'undefined') {
-		fileSync.loadFromDB().catch(console.error);
+		fileSync.loadFromDB().catch(() => {});
 	}
-
-	console.log('Collaboration setup complete');
 
 	return {
 		ydoc,

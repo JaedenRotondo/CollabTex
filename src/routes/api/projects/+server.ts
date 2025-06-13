@@ -41,14 +41,14 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.where(eq(projectShare.sharedWithUserId, locals.user.id));
 
 		// Transform and combine projects
-		const transformedOwnedProjects = ownedProjects.map(p => ({
+		const transformedOwnedProjects = ownedProjects.map((p) => ({
 			...p,
 			isOwner: true,
 			permission: 'edit' as const,
 			sharedBy: null
 		}));
 
-		const transformedSharedProjects = sharedProjects.map(p => ({
+		const transformedSharedProjects = sharedProjects.map((p) => ({
 			...p,
 			isOwner: false,
 			permission: p.permission,

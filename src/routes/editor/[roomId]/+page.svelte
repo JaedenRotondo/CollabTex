@@ -6,11 +6,10 @@
 	import Editor from '$lib/components/Editor.svelte';
 	import PDFViewer from '$lib/components/PDFViewer.svelte';
 	import Toolbar from '$lib/components/Toolbar.svelte';
-	import FileExplorer from '$lib/components/FileExplorer.svelte';
 	import UserPresence from '$lib/components/UserPresence.svelte';
 	import CompileErrors from '$lib/components/CompileErrors.svelte';
 	import ShareModal from '$lib/components/ShareModal.svelte';
-	import { initializeCollaboration, updateUserAwareness, type FileNode } from '$lib/collaboration/yjs-setup';
+	import { initializeCollaboration, updateUserAwareness } from '$lib/collaboration/yjs-setup';
 	import type { FileSync } from '$lib/collaboration/file-sync';
 	import type { CompileError } from '$lib/latex/compiler';
 	import { configureCompiler } from '$lib/latex/compiler';
@@ -20,7 +19,6 @@
 	let mainContent: Y.Text | undefined;
 	let fileSync: FileSync | undefined;
 	let roomId = $page.params.roomId;
-	let showFileExplorer = true;
 	let pdfData: ArrayBuffer | null = null;
 	let compileErrors: CompileError[] = [];
 
@@ -29,15 +27,12 @@
 	let showErrors = false;
 	let shareModalOpen = false;
 	let projectName = 'Untitled Project';
-	let editorComponent: any;
+	let editorComponent: Editor;
 	let userPermission: 'view' | 'edit' = 'edit';
 	let isOwner = false;
 	let currentUser: { username: string } | null = null;
 
 	onMount(() => {
-		console.log('Editor mounting for room:', roomId);
-		console.log('Page params:', $page.params);
-
 		// Configure compiler to use server compilation
 		configureCompiler({
 			useServer: true,
@@ -50,10 +45,8 @@
 			provider = collab.provider;
 			mainContent = collab.mainContent;
 			fileSync = collab.fileSync;
-
-			console.log('Collaboration initialized successfully');
-		} catch (error) {
-			console.error('Failed to initialize collaboration:', error);
+		} catch {
+			// Failed to initialize collaboration
 		}
 
 		// Fetch project details and user info asynchronously
@@ -64,11 +57,10 @@
 				if (userResponse.ok) {
 					const userData = await userResponse.json();
 					currentUser = userData.user;
-					
+
 					// Update user awareness with real user info
 					if (currentUser && provider) {
 						updateUserAwareness(provider, currentUser);
-						console.log('Updated user awareness with:', currentUser.username);
 					}
 				}
 
@@ -80,13 +72,12 @@
 					userPermission = data.userPermission || 'view';
 					isOwner = data.isOwner || false;
 				}
-			} catch (error) {
-				console.error('Failed to fetch project details:', error);
+			} catch {
+				// Failed to fetch project details
 			}
 		})();
 
 		return () => {
-			console.log('Cleaning up collaboration');
 			provider?.destroy();
 			ydoc?.destroy();
 			fileSync?.destroy();
@@ -118,8 +109,6 @@
 	}
 
 	async function handleImport(event: CustomEvent<{ message: string; filesImported: number }>) {
-		console.log('Import successful:', event.detail);
-
 		// Refresh the file sync to load imported files from database
 		if (fileSync) {
 			await fileSync.loadFromDB();
@@ -130,7 +119,6 @@
 	}
 
 	function handleImportError(event: CustomEvent<{ error: string }>) {
-		console.error('Import failed:', event.detail.error);
 		alert(`Import failed: ${event.detail.error}`);
 	}
 
@@ -172,16 +160,11 @@
 
 			// Clean up the temporary URL
 			URL.revokeObjectURL(url);
-		} catch (error) {
-			console.error('Error downloading PDF:', error);
+		} catch {
 			alert('Failed to download PDF. Please try again.');
 		}
 	}
 
-	function handleFileSelect() {
-		// File selection is handled by the FileExplorer component
-		// The active file is automatically synced via Yjs
-	}
 </script>
 
 <svelte:head>
@@ -213,7 +196,13 @@
 			<div class="flex flex-1">
 				<div class="bg-academic-editor flex-1">
 					{#if ydoc && provider && mainContent}
-						<Editor bind:this={editorComponent} {ydoc} {provider} {mainContent} readonly={userPermission === 'view'} />
+						<Editor
+							bind:this={editorComponent}
+							{ydoc}
+							{provider}
+							{mainContent}
+							readonly={userPermission === 'view'}
+						/>
 					{/if}
 					<CompileErrors
 						errors={compileErrors}

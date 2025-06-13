@@ -110,14 +110,14 @@
 		});
 	}
 
-	$: filteredProjects = projects.filter(project => {
+	$: filteredProjects = projects.filter((project) => {
 		if (filterView === 'owned') return project.isOwner;
 		if (filterView === 'shared') return !project.isOwner;
 		return true; // 'all'
 	});
 
-	$: ownedCount = projects.filter(p => p.isOwner).length;
-	$: sharedCount = projects.filter(p => !p.isOwner).length;
+	$: ownedCount = projects.filter((p) => p.isOwner).length;
+	$: sharedCount = projects.filter((p) => !p.isOwner).length;
 </script>
 
 <div class="bg-background min-h-screen">
@@ -157,23 +157,31 @@
 		<div class="bg-card rounded-lg p-6">
 			<div class="mb-6 flex items-center justify-between">
 				<h2 class="text-xl font-semibold">Your Projects</h2>
-				
+
 				<div class="flex rounded-md border">
 					<button
-						class="px-4 py-2 text-sm font-medium transition-colors rounded-l-md {filterView === 'all' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}"
-						on:click={() => filterView = 'all'}
+						class="rounded-l-md px-4 py-2 text-sm font-medium transition-colors {filterView ===
+						'all'
+							? 'bg-primary text-primary-foreground'
+							: 'bg-background hover:bg-muted'}"
+						on:click={() => (filterView = 'all')}
 					>
 						All ({projects.length})
 					</button>
 					<button
-						class="px-4 py-2 text-sm font-medium transition-colors border-x {filterView === 'owned' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}"
-						on:click={() => filterView = 'owned'}
+						class="border-x px-4 py-2 text-sm font-medium transition-colors {filterView === 'owned'
+							? 'bg-primary text-primary-foreground'
+							: 'bg-background hover:bg-muted'}"
+						on:click={() => (filterView = 'owned')}
 					>
 						Owned ({ownedCount})
 					</button>
 					<button
-						class="px-4 py-2 text-sm font-medium transition-colors rounded-r-md {filterView === 'shared' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}"
-						on:click={() => filterView = 'shared'}
+						class="rounded-r-md px-4 py-2 text-sm font-medium transition-colors {filterView ===
+						'shared'
+							? 'bg-primary text-primary-foreground'
+							: 'bg-background hover:bg-muted'}"
+						on:click={() => (filterView = 'shared')}
 					>
 						Shared ({sharedCount})
 					</button>
@@ -184,9 +192,13 @@
 				<p class="text-muted-foreground">Loading projects...</p>
 			{:else if filteredProjects.length === 0}
 				{#if filterView === 'owned'}
-					<p class="text-muted-foreground">No owned projects yet. Create your first project above!</p>
+					<p class="text-muted-foreground">
+						No owned projects yet. Create your first project above!
+					</p>
 				{:else if filterView === 'shared'}
-					<p class="text-muted-foreground">No shared projects yet. Projects shared with you will appear here.</p>
+					<p class="text-muted-foreground">
+						No shared projects yet. Projects shared with you will appear here.
+					</p>
 				{:else}
 					<p class="text-muted-foreground">No projects yet. Create your first project above!</p>
 				{/if}
@@ -197,26 +209,30 @@
 							<div class="mb-2 flex items-center justify-between">
 								<h3 class="text-lg font-semibold">{project.name}</h3>
 								{#if project.isOwner}
-									<span class="bg-primary/10 text-primary rounded-full px-2 py-1 text-xs font-medium">
+									<span
+										class="bg-primary/10 text-primary rounded-full px-2 py-1 text-xs font-medium"
+									>
 										Owner
 									</span>
 								{:else}
-									<span class="bg-blue-100 text-blue-800 rounded-full px-2 py-1 text-xs font-medium">
+									<span
+										class="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800"
+									>
 										{project.permission}
 									</span>
 								{/if}
 							</div>
-							
+
 							{#if !project.isOwner && project.sharedBy}
 								<p class="text-muted-foreground mb-2 text-xs">
 									Shared by: {project.sharedBy}
 								</p>
 							{/if}
-							
+
 							<p class="text-muted-foreground mb-3 text-sm">
 								Updated: {formatDate(project.updatedAt)}
 							</p>
-							
+
 							<div class="flex gap-2">
 								<Button
 									variant="default"

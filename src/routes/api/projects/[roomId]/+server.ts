@@ -46,7 +46,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				}
 
 				// Find the most permissive access level
-				const hasEdit = shares.some(share => share.permission === 'edit');
+				const hasEdit = shares.some((share) => share.permission === 'edit');
 				userPermission = hasEdit ? 'edit' : 'view';
 			}
 		} else {
@@ -63,7 +63,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			}
 
 			// For anonymous users, use the most permissive public permission
-			const hasEdit = publicShares.some(share => share.permission === 'edit');
+			const hasEdit = publicShares.some((share) => share.permission === 'edit');
 			userPermission = hasEdit ? 'edit' : 'view';
 		}
 
