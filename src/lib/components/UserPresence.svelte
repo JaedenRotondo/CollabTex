@@ -47,7 +47,7 @@
 	>
 		<span class="text-academic-gray-600 text-sm font-medium">Active users:</span>
 		<div class="flex -space-x-2">
-			{#each Array.from(users.entries()) as [, user], i (user.name)}
+			{#each Array.from(users.entries()) as [clientId, user], i (clientId)}
 				<div
 					class="ring-academic-paper flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white ring-2 transition-transform duration-200 hover:scale-110"
 					style="background-color: {user.color}; z-index: {users.size - i}"

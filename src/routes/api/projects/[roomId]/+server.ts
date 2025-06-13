@@ -18,10 +18,15 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		const projectData = projects[0];
 
 		// Check if user has access (owner or shared with)
-		if (locals.user) {
-			const isOwner = projectData.ownerId === locals.user.id;
+		let userPermission = 'view'; // default for anonymous users
+		let isOwner = false;
 
-			if (!isOwner) {
+		if (locals.user) {
+			isOwner = projectData.ownerId === locals.user.id;
+
+			if (isOwner) {
+				userPermission = 'edit'; // owners always have edit permission
+			} else {
 				// Check if project is shared with this user
 				const shares = await db
 					.select()
@@ -39,6 +44,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				if (shares.length === 0) {
 					return json({ error: 'Access denied' }, { status: 403 });
 				}
+
+				// Find the most permissive access level
+				const hasEdit = shares.some(share => share.permission === 'edit');
+				userPermission = hasEdit ? 'edit' : 'view';
 			}
 		} else {
 			// Anonymous user - check if project has public sharing
@@ -52,6 +61,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			if (publicShares.length === 0) {
 				return json({ error: 'Unauthorized' }, { status: 401 });
 			}
+
+			// For anonymous users, use the most permissive public permission
+			const hasEdit = publicShares.some(share => share.permission === 'edit');
+			userPermission = hasEdit ? 'edit' : 'view';
 		}
 
 		// Get all files for this project
@@ -59,7 +72,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 		return json({
 			project: projectData,
-			files: files
+			files: files,
+			userPermission: userPermission,
+			isOwner: isOwner
 		});
 	} catch (error) {
 		console.error('Error fetching project:', error);

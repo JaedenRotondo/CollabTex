@@ -17,6 +17,8 @@
 
 	export let ydoc: Y.Doc;
 	export let mainContent: Y.Text;
+	export let readonly: boolean = false;
+	export let isOwner: boolean = false;
 
 	const dispatch = createEventDispatcher();
 	let compiling = false;
@@ -210,22 +212,24 @@
 			Download PDF
 		</Button>
 
-		<Button
-			variant="outline"
-			size="sm"
-			on:click={handleImport}
-			disabled={importing}
-			id="toolbar-import"
-			class="border-academic-gray-300 text-academic-gray-700 hover:bg-academic-gray-50 hover:text-academic-gray-900 transition-colors duration-200"
-		>
-			{#if importing}
-				<span class="mr-2 animate-spin">⟳</span>
-				Importing...
-			{:else}
-				<Upload size={16} class="mr-1" />
-				Import
-			{/if}
-		</Button>
+		{#if !readonly}
+			<Button
+				variant="outline"
+				size="sm"
+				on:click={handleImport}
+				disabled={importing}
+				id="toolbar-import"
+				class="border-academic-gray-300 text-academic-gray-700 hover:bg-academic-gray-50 hover:text-academic-gray-900 transition-colors duration-200"
+			>
+				{#if importing}
+					<span class="mr-2 animate-spin">⟳</span>
+					Importing...
+				{:else}
+					<Upload size={16} class="mr-1" />
+					Import
+				{/if}
+			</Button>
+		{/if}
 	</div>
 
 	<div class="flex items-center gap-4">
@@ -251,15 +255,17 @@
 			</button>
 		</div>
 
-		<Button
-			variant="outline"
-			size="sm"
-			on:click={handleShare}
-			class="border-academic-gray-300 text-academic-gray-700 hover:bg-academic-gray-50 hover:text-academic-gray-900 transition-colors duration-200"
-		>
-			<Share2 size={16} class="mr-1" />
-			Share
-		</Button>
+		{#if isOwner}
+			<Button
+				variant="outline"
+				size="sm"
+				on:click={handleShare}
+				class="border-academic-gray-300 text-academic-gray-700 hover:bg-academic-gray-50 hover:text-academic-gray-900 transition-colors duration-200"
+			>
+				<Share2 size={16} class="mr-1" />
+				Share
+			</Button>
+		{/if}
 	</div>
 </div>
 

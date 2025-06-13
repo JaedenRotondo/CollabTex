@@ -16,6 +16,7 @@
 	export let ydoc: Y.Doc;
 	export let provider: WebrtcProvider;
 	export let mainContent: Y.Text;
+	export let readonly: boolean = false;
 
 	let editorContainer: HTMLDivElement;
 	let view: EditorView | undefined;
@@ -58,7 +59,8 @@
 				codeFolding(),
 				foldGutter(),
 				keymap.of(foldKeymap),
-				latexFoldService
+				latexFoldService,
+				...(readonly ? [EditorState.readOnly.of(true)] : [])
 			]
 		});
 

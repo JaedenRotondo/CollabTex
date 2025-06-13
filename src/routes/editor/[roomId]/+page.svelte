@@ -10,7 +10,7 @@
 	import UserPresence from '$lib/components/UserPresence.svelte';
 	import CompileErrors from '$lib/components/CompileErrors.svelte';
 	import ShareModal from '$lib/components/ShareModal.svelte';
-	import { initializeCollaboration, type FileNode } from '$lib/collaboration/yjs-setup';
+	import { initializeCollaboration, updateUserAwareness, type FileNode } from '$lib/collaboration/yjs-setup';
 	import type { FileSync } from '$lib/collaboration/file-sync';
 	import type { CompileError } from '$lib/latex/compiler';
 	import { configureCompiler } from '$lib/latex/compiler';
@@ -30,9 +30,13 @@
 	let shareModalOpen = false;
 	let projectName = 'Untitled Project';
 	let editorComponent: any;
+	let userPermission: 'view' | 'edit' = 'edit';
+	let isOwner = false;
+	let currentUser: { username: string } | null = null;
 
 	onMount(() => {
-		console.log('Initializing collaboration for room:', roomId);
+		console.log('Editor mounting for room:', roomId);
+		console.log('Page params:', $page.params);
 
 		// Configure compiler to use server compilation
 		configureCompiler({
@@ -52,13 +56,29 @@
 			console.error('Failed to initialize collaboration:', error);
 		}
 
-		// Fetch project name asynchronously
+		// Fetch project details and user info asynchronously
 		(async () => {
 			try {
+				// Fetch user info first
+				const userResponse = await fetch('/api/user');
+				if (userResponse.ok) {
+					const userData = await userResponse.json();
+					currentUser = userData.user;
+					
+					// Update user awareness with real user info
+					if (currentUser && provider) {
+						updateUserAwareness(provider, currentUser);
+						console.log('Updated user awareness with:', currentUser.username);
+					}
+				}
+
+				// Fetch project details
 				const response = await fetch(`/api/projects/${roomId}`);
 				if (response.ok) {
 					const data = await response.json();
 					projectName = data.project?.name || 'Untitled Project';
+					userPermission = data.userPermission || 'view';
+					isOwner = data.isOwner || false;
 				}
 			} catch (error) {
 				console.error('Failed to fetch project details:', error);
@@ -182,6 +202,8 @@
 				on:unfoldAll={() => editorComponent?.unfoldAllSections()}
 				{ydoc}
 				{mainContent}
+				readonly={userPermission === 'view'}
+				{isOwner}
 			/>
 		{/if}
 
@@ -191,7 +213,7 @@
 			<div class="flex flex-1">
 				<div class="bg-academic-editor flex-1">
 					{#if ydoc && provider && mainContent}
-						<Editor bind:this={editorComponent} {ydoc} {provider} {mainContent} />
+						<Editor bind:this={editorComponent} {ydoc} {provider} {mainContent} readonly={userPermission === 'view'} />
 					{/if}
 					<CompileErrors
 						errors={compileErrors}
