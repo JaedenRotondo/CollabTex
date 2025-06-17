@@ -37,3 +37,5 @@ SIGNALING_SERVER_SECURITY.md
 .env.local
 .env.production
 .env.development
+DEMO_VIDEO_SCRIPT.md
+CLAUDE.md

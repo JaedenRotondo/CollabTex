@@ -174,21 +174,21 @@
 {#if isOpen}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" on:click={close}>
 		<div
-			class="bg-academic-paper border-academic-border w-full max-w-lg rounded-lg border p-6 shadow-xl"
+			class="bg-white/95 backdrop-blur-sm border-teal-200 w-full max-w-lg rounded-lg border p-6 shadow-xl"
 			on:click|stopPropagation
 		>
 			<div class="mb-4 flex items-center justify-between">
-				<h2 class="text-academic-gray-900 text-xl font-semibold">Share "{projectName}"</h2>
+				<h2 class="text-gray-800 text-xl font-semibold">Share "{projectName}"</h2>
 				<button
 					on:click={close}
-					class="text-academic-gray-500 hover:text-academic-gray-700 transition-colors duration-200"
+					class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
 				>
 					✕
 				</button>
 			</div>
 
 			{#if error}
-				<div class="text-academic-error mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm">
+				<div class="text-red-700 mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm">
 					{error}
 				</div>
 			{/if}
@@ -197,8 +197,8 @@
 				<!-- Show room link for non-owners -->
 				<div class="space-y-4">
 					<div>
-						<h3 class="text-academic-gray-800 mb-3 font-semibold">Room Link</h3>
-						<p class="text-academic-gray-600 mb-2 text-sm">
+						<h3 class="text-gray-800 mb-3 font-semibold">Room Link</h3>
+						<p class="text-gray-600 mb-2 text-sm">
 							You can share this room link with others:
 						</p>
 						<div class="flex gap-2">
@@ -206,47 +206,47 @@
 								type="text"
 								value={`${window.location.origin}/editor/${roomId}`}
 								readonly
-								class="border-academic-gray-300 bg-academic-gray-50 text-academic-gray-700 flex-1 rounded border px-3 py-2 text-sm"
+								class="border-teal-200 bg-teal-50 text-gray-700 flex-1 rounded border px-3 py-2 text-sm"
 							/>
-							<Button size="sm" on:click={copyPublicLink}>Copy</Button>
+							<Button size="sm" on:click={copyPublicLink} class="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white">Copy</Button>
 						</div>
 					</div>
 				</div>
 				<div class="mt-6 flex justify-end">
-					<Button variant="outline" on:click={close}>Close</Button>
+					<Button variant="outline" on:click={close} class="border-teal-300 text-teal-700 hover:bg-teal-50">Close</Button>
 				</div>
 			{:else}
 				<div class="space-y-6">
 					<!-- Share with specific user -->
 					<div>
-						<h3 class="text-academic-gray-800 mb-3 font-semibold">Share with user</h3>
+						<h3 class="text-gray-800 mb-3 font-semibold">Share with user</h3>
 						<form on:submit|preventDefault={shareWithUser} class="flex gap-2">
 							<input
 								type="text"
 								bind:value={shareUsername}
 								placeholder="Username"
-								class="border-academic-gray-300 focus:ring-academic-primary focus:border-academic-primary flex-1 rounded border px-3 py-2 transition-colors duration-200 focus:ring-2 focus:outline-none"
+								class="border-teal-200 focus:ring-teal-200 focus:border-teal-400 flex-1 rounded border px-3 py-2 transition-colors duration-200 focus:ring-2 focus:outline-none"
 								disabled={sharing}
 							/>
 							<select
 								bind:value={sharePermission}
-								class="border-academic-gray-300 focus:ring-academic-primary focus:border-academic-primary rounded border px-3 py-2 transition-colors duration-200 focus:ring-2 focus:outline-none"
+								class="border-teal-200 focus:ring-teal-200 focus:border-teal-400 rounded border px-3 py-2 transition-colors duration-200 focus:ring-2 focus:outline-none"
 								disabled={sharing}
 							>
 								<option value="view">View</option>
 								<option value="edit">Edit</option>
 							</select>
-							<Button type="submit" disabled={sharing || !shareUsername.trim()}>Share</Button>
+							<Button type="submit" disabled={sharing || !shareUsername.trim()} class="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white">Share</Button>
 						</form>
 					</div>
 
 					<!-- Public link -->
 					<div>
-						<h3 class="text-academic-gray-800 mb-3 font-semibold">Public link</h3>
+						<h3 class="text-gray-800 mb-3 font-semibold">Public link</h3>
 						{#if shares.some((s) => s.isPublic)}
-							<div class="bg-academic-gray-50 border-academic-gray-200 rounded border p-3">
+							<div class="bg-teal-50 border-teal-200 rounded border p-3">
 								<div class="mb-2 flex items-center justify-between">
-									<span class="text-academic-gray-700 text-sm">
+									<span class="text-gray-700 text-sm">
 										Anyone with the link can {shares.find((s) => s.isPublic)?.permission}
 									</span>
 									<button
@@ -254,7 +254,7 @@
 											const publicShare = shares.find((s) => s.isPublic);
 											if (publicShare) removeShare(publicShare.id);
 										}}
-										class="text-academic-error text-sm transition-colors duration-200 hover:underline"
+										class="text-red-700 text-sm transition-colors duration-200 hover:underline"
 									>
 										Remove
 									</button>
@@ -264,44 +264,44 @@
 										type="text"
 										value={`${window.location.origin}/editor/${roomId}`}
 										readonly
-										class="border-academic-gray-300 bg-academic-paper text-academic-gray-700 flex-1 rounded border px-3 py-2 text-sm"
+										class="border-teal-200 bg-white text-gray-700 flex-1 rounded border px-3 py-2 text-sm"
 									/>
-									<Button size="sm" on:click={copyPublicLink}>Copy</Button>
+									<Button size="sm" on:click={copyPublicLink} class="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white">Copy</Button>
 								</div>
 							</div>
 						{:else}
 							<div class="flex gap-2">
 								<select
 									bind:value={publicLinkPermission}
-									class="border-academic-gray-300 focus:ring-academic-primary focus:border-academic-primary rounded border px-3 py-2 transition-colors duration-200 focus:ring-2 focus:outline-none"
+									class="border-teal-200 focus:ring-teal-200 focus:border-teal-400 rounded border px-3 py-2 transition-colors duration-200 focus:ring-2 focus:outline-none"
 									disabled={sharing}
 								>
 									<option value="view">View only</option>
 									<option value="edit">Edit</option>
 								</select>
-								<Button on:click={createPublicLink} disabled={sharing}>Create public link</Button>
+								<Button on:click={createPublicLink} disabled={sharing} class="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white">Create public link</Button>
 							</div>
 						{/if}
 					</div>
 
 					<!-- Existing shares -->
 					{#if loading}
-						<p class="text-academic-gray-500">Loading shares...</p>
+						<p class="text-gray-500">Loading shares...</p>
 					{:else if shares.filter((s) => !s.isPublic).length > 0}
 						<div>
-							<h3 class="text-academic-gray-800 mb-3 font-semibold">Shared with</h3>
+							<h3 class="text-gray-800 mb-3 font-semibold">Shared with</h3>
 							<div class="space-y-2">
 								{#each shares.filter((s) => !s.isPublic) as share}
 									<div
-										class="bg-academic-gray-50 border-academic-gray-200 flex items-center justify-between rounded border p-3"
+										class="bg-teal-50 border-teal-200 flex items-center justify-between rounded border p-3"
 									>
 										<div>
-											<span class="text-academic-gray-900 font-medium">{share.username}</span>
-											<span class="text-academic-gray-600 ml-2 text-sm">({share.permission})</span>
+											<span class="text-gray-800 font-medium">{share.username}</span>
+											<span class="text-gray-600 ml-2 text-sm">({share.permission})</span>
 										</div>
 										<button
 											on:click={() => removeShare(share.id)}
-											class="text-academic-error text-sm transition-colors duration-200 hover:underline"
+											class="text-red-700 text-sm transition-colors duration-200 hover:underline"
 										>
 											Remove
 										</button>
@@ -313,7 +313,7 @@
 				</div>
 
 				<div class="mt-6 flex justify-end">
-					<Button variant="outline" on:click={close}>Close</Button>
+					<Button variant="outline" on:click={close} class="border-teal-300 text-teal-700 hover:bg-teal-50">Close</Button>
 				</div>
 			{/if}
 		</div>

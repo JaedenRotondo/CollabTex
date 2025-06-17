@@ -120,67 +120,70 @@
 	$: sharedCount = projects.filter((p) => !p.isOwner).length;
 </script>
 
-<div class="bg-background min-h-screen">
+<div class="min-h-screen bg-gradient-to-br from-teal-50 via-emerald-50 to-green-50">
 	<div class="container mx-auto px-4 py-8">
 		<div class="mb-8 flex items-center justify-between">
-			<div>
-				<h1 class="mb-2 text-3xl font-bold">My Projects</h1>
-				<p class="text-muted-foreground">Welcome back, {data.user.username}!</p>
+			<div class="flex items-center gap-4">
+				<img src="/collabtex-logo.png" alt="CollabTex" class="h-12 w-12 rounded-lg shadow-md" />
+				<div>
+					<h1 class="mb-2 text-3xl font-bold text-gray-800">My Projects</h1>
+					<p class="text-gray-600">Welcome back, {data.user.username}!</p>
+				</div>
 			</div>
 			<form method="post" action="/demo/lucia?/logout">
-				<Button type="submit" variant="outline">Logout</Button>
+				<Button type="submit" variant="outline" class="border-teal-300 text-teal-700 hover:bg-teal-50">Logout</Button>
 			</form>
 		</div>
 
 		{#if error}
-			<div class="bg-destructive/10 text-destructive mb-4 rounded-md p-4">
+			<div class="mb-4 rounded-md bg-red-50 p-4 text-red-700 border border-red-200">
 				{error}
 			</div>
 		{/if}
 
-		<div class="bg-card mb-6 rounded-lg p-6">
-			<h2 class="mb-4 text-xl font-semibold">Create New Project</h2>
+		<div class="mb-6 rounded-lg bg-white/70 backdrop-blur-sm p-6 shadow-sm border border-teal-100">
+			<h2 class="mb-4 text-xl font-semibold text-gray-800">Create New Project</h2>
 			<form on:submit|preventDefault={createProject} class="flex gap-4">
 				<input
 					type="text"
 					bind:value={newProjectName}
 					placeholder="Project name"
-					class="focus:ring-primary flex-1 rounded-md border px-4 py-2 focus:ring-2 focus:outline-none"
+					class="flex-1 rounded-md border border-teal-200 px-4 py-2 focus:border-teal-400 focus:ring-2 focus:ring-teal-200 focus:outline-none transition-colors"
 					disabled={creatingProject}
 				/>
-				<Button type="submit" disabled={creatingProject || !newProjectName.trim()}>
+				<Button type="submit" disabled={creatingProject || !newProjectName.trim()} class="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white shadow-md">
 					{creatingProject ? 'Creating...' : 'Create Project'}
 				</Button>
 			</form>
 		</div>
 
-		<div class="bg-card rounded-lg p-6">
+		<div class="rounded-lg bg-white/70 backdrop-blur-sm p-6 shadow-sm border border-teal-100">
 			<div class="mb-6 flex items-center justify-between">
-				<h2 class="text-xl font-semibold">Your Projects</h2>
+				<h2 class="text-xl font-semibold text-gray-800">Your Projects</h2>
 
 				<div class="flex rounded-md border">
 					<button
 						class="rounded-l-md px-4 py-2 text-sm font-medium transition-colors {filterView ===
 						'all'
-							? 'bg-primary text-primary-foreground'
-							: 'bg-background hover:bg-muted'}"
+							? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-sm'
+							: 'bg-white/50 text-gray-700 hover:bg-teal-50 border border-teal-200'}"
 						on:click={() => (filterView = 'all')}
 					>
 						All ({projects.length})
 					</button>
 					<button
-						class="border-x px-4 py-2 text-sm font-medium transition-colors {filterView === 'owned'
-							? 'bg-primary text-primary-foreground'
-							: 'bg-background hover:bg-muted'}"
+						class="border-x border-teal-200 px-4 py-2 text-sm font-medium transition-colors {filterView === 'owned'
+							? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-sm'
+							: 'bg-white/50 text-gray-700 hover:bg-teal-50'}"
 						on:click={() => (filterView = 'owned')}
 					>
 						Owned ({ownedCount})
 					</button>
 					<button
-						class="rounded-r-md px-4 py-2 text-sm font-medium transition-colors {filterView ===
+						class="rounded-r-md px-4 py-2 text-sm font-medium transition-colors border border-teal-200 {filterView ===
 						'shared'
-							? 'bg-primary text-primary-foreground'
-							: 'bg-background hover:bg-muted'}"
+							? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-sm'
+							: 'bg-white/50 text-gray-700 hover:bg-teal-50'}"
 						on:click={() => (filterView = 'shared')}
 					>
 						Shared ({sharedCount})
@@ -189,28 +192,28 @@
 			</div>
 
 			{#if loading}
-				<p class="text-muted-foreground">Loading projects...</p>
+				<p class="text-gray-600">Loading projects...</p>
 			{:else if filteredProjects.length === 0}
 				{#if filterView === 'owned'}
-					<p class="text-muted-foreground">
+					<p class="text-gray-600">
 						No owned projects yet. Create your first project above!
 					</p>
 				{:else if filterView === 'shared'}
-					<p class="text-muted-foreground">
+					<p class="text-gray-600">
 						No shared projects yet. Projects shared with you will appear here.
 					</p>
 				{:else}
-					<p class="text-muted-foreground">No projects yet. Create your first project above!</p>
+					<p class="text-gray-600">No projects yet. Create your first project above!</p>
 				{/if}
 			{:else}
 				<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{#each filteredProjects as project}
-						<div class="rounded-lg border p-4 transition-shadow hover:shadow-md">
+						<div class="rounded-lg border border-teal-100 bg-white/60 backdrop-blur-sm p-4 transition-all hover:shadow-md hover:bg-white/80">
 							<div class="mb-2 flex items-center justify-between">
-								<h3 class="text-lg font-semibold">{project.name}</h3>
+								<h3 class="text-lg font-semibold text-gray-800">{project.name}</h3>
 								{#if project.isOwner}
 									<span
-										class="bg-primary/10 text-primary rounded-full px-2 py-1 text-xs font-medium"
+										class="bg-gradient-to-r from-teal-100 to-emerald-100 text-teal-700 rounded-full px-2 py-1 text-xs font-medium"
 									>
 										Owner
 									</span>
@@ -224,12 +227,12 @@
 							</div>
 
 							{#if !project.isOwner && project.sharedBy}
-								<p class="text-muted-foreground mb-2 text-xs">
+								<p class="text-gray-600 mb-2 text-xs">
 									Shared by: {project.sharedBy}
 								</p>
 							{/if}
 
-							<p class="text-muted-foreground mb-3 text-sm">
+							<p class="text-gray-600 mb-3 text-sm">
 								Updated: {formatDate(project.updatedAt)}
 							</p>
 
@@ -238,17 +241,19 @@
 									variant="default"
 									size="sm"
 									on:click={() => goto(`/editor/${project.roomId}`)}
+									class="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white shadow-sm"
 								>
 									Open
 								</Button>
 								{#if project.isOwner}
-									<Button variant="outline" size="sm" on:click={() => openShareModal(project)}>
+									<Button variant="outline" size="sm" on:click={() => openShareModal(project)} class="border-teal-300 text-teal-700 hover:bg-teal-50">
 										Share
 									</Button>
 									<Button
 										variant="outline"
 										size="sm"
 										on:click={() => deleteProject(project.id, project.roomId)}
+										class="border-red-300 text-red-700 hover:bg-red-50"
 									>
 										Delete
 									</Button>

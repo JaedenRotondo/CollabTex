@@ -155,7 +155,7 @@
 </script>
 
 <div
-	class="bg-academic-toolbar border-academic-border flex items-center justify-between border-b px-4 py-3 shadow-sm"
+	class="bg-white/90 backdrop-blur-sm border-teal-200 flex items-center justify-between border-b px-4 py-3 shadow-sm"
 >
 	<div class="flex items-center gap-3">
 		<Button
@@ -163,19 +163,19 @@
 			size="sm"
 			on:click={handleHome}
 			title="Go to Dashboard"
-			class="border-academic-gray-300 text-academic-gray-600 hover:bg-academic-gray-50 hover:text-academic-gray-800 transition-colors duration-200"
+			class="border-teal-300 text-teal-700 hover:bg-teal-50 hover:text-teal-800 transition-colors duration-200"
 		>
 			<Home size={16} />
 		</Button>
 
-		<div class="bg-academic-gray-300 h-6 w-px"></div>
+		<div class="bg-teal-300 h-6 w-px"></div>
 
 		<Button
 			variant="default"
 			size="sm"
 			on:click={handleCompile}
 			disabled={compiling}
-			class="bg-academic-primary hover:bg-academic-primary-dark px-4 py-2 font-medium text-white shadow-sm transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
+			class="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 px-4 py-2 font-medium text-white shadow-sm transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
 		>
 			{#if compiling}
 				<span class="mr-2 animate-spin">⟳</span>
@@ -187,7 +187,7 @@
 
 		{#if lastCompileStatus === 'success'}
 			<div
-				class="text-academic-success bg-academic-primary-light flex items-center gap-1.5 rounded-md px-3 py-1.5"
+				class="text-emerald-700 bg-emerald-100 flex items-center gap-1.5 rounded-md px-3 py-1.5"
 			>
 				<CheckCircle size={16} />
 				<span class="text-sm font-medium">Success</span>
@@ -195,7 +195,7 @@
 		{:else if lastCompileStatus === 'error'}
 			<button
 				on:click={() => dispatch('toggleErrors')}
-				class="text-academic-error flex items-center gap-1.5 rounded-md bg-red-50 px-3 py-1.5 transition-colors duration-200 hover:bg-red-100 hover:text-red-700"
+				class="text-red-700 flex items-center gap-1.5 rounded-md bg-red-50 px-3 py-1.5 transition-colors duration-200 hover:bg-red-100 hover:text-red-800"
 			>
 				<AlertCircle size={16} />
 				<span class="text-sm font-medium">{errorCount} {errorCount === 1 ? 'error' : 'errors'}</span
@@ -207,7 +207,7 @@
 			variant="outline"
 			size="sm"
 			on:click={handleDownload}
-			class="border-academic-gray-300 text-academic-gray-700 hover:bg-academic-gray-50 hover:text-academic-gray-900 transition-colors duration-200"
+			class="border-teal-300 text-teal-700 hover:bg-teal-50 hover:text-teal-900 transition-colors duration-200"
 		>
 			Download PDF
 		</Button>
@@ -219,7 +219,7 @@
 				on:click={handleImport}
 				disabled={importing}
 				id="toolbar-import"
-				class="border-academic-gray-300 text-academic-gray-700 hover:bg-academic-gray-50 hover:text-academic-gray-900 transition-colors duration-200"
+				class="border-teal-300 text-teal-700 hover:bg-teal-50 hover:text-teal-900 transition-colors duration-200"
 			>
 				{#if importing}
 					<span class="mr-2 animate-spin">⟳</span>
@@ -234,21 +234,21 @@
 
 	<div class="flex items-center gap-4">
 		<div class="flex items-center gap-2">
-			<img src="/collabtex-logo.png" alt="CollabTeX" class="h-6 w-6 rounded" />
-			<span class="text-academic-gray-700 text-sm font-semibold">CollabTeX</span>
+			<img src="/collabtex-logo.png" alt="CollabTeX" class="h-6 w-6 rounded shadow-sm" />
+			<span class="text-gray-700 text-sm font-semibold">CollabTeX</span>
 		</div>
 
-		<div class="border-academic-gray-300 flex items-center gap-1 border-l pl-4">
+		<div class="border-teal-300 flex items-center gap-1 border-l pl-4">
 			<button
 				on:click={handleFoldAll}
-				class="hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 rounded p-2 transition-colors duration-200"
+				class="hover:bg-teal-100 text-teal-600 hover:text-teal-800 rounded p-2 transition-colors duration-200"
 				title="Fold all sections"
 			>
 				<ChevronsUp size={16} />
 			</button>
 			<button
 				on:click={handleUnfoldAll}
-				class="hover:bg-academic-gray-100 text-academic-gray-600 hover:text-academic-gray-800 rounded p-2 transition-colors duration-200"
+				class="hover:bg-teal-100 text-teal-600 hover:text-teal-800 rounded p-2 transition-colors duration-200"
 				title="Unfold all sections"
 			>
 				<ChevronsDown size={16} />
@@ -260,7 +260,7 @@
 				variant="outline"
 				size="sm"
 				on:click={handleShare}
-				class="border-academic-gray-300 text-academic-gray-700 hover:bg-academic-gray-50 hover:text-academic-gray-900 transition-colors duration-200"
+				class="border-teal-300 text-teal-700 hover:bg-teal-50 hover:text-teal-900 transition-colors duration-200"
 			>
 				<Share2 size={16} class="mr-1" />
 				Share

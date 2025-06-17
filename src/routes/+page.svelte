@@ -128,7 +128,7 @@
 </script>
 
 <div
-	class="from-academic-gray-50 to-academic-gray-100 flex min-h-screen items-center justify-center bg-gradient-to-b p-4"
+	class="flex min-h-screen items-center justify-center bg-gradient-to-br from-teal-50 via-emerald-50 to-green-50 p-4"
 >
 	<div class="w-full max-w-md">
 		<!-- CollabTeX official logo centered -->
@@ -136,21 +136,21 @@
 			<img
 				src="/collabtex-logo.png"
 				alt="CollabTeX"
-				class="h-32 w-32 rounded-lg bg-white opacity-90 shadow-lg transition-opacity duration-200 hover:opacity-100"
+				class="h-32 w-32 rounded-lg shadow-xl transition-transform duration-200 hover:scale-105"
 			/>
 		</div>
 		<div class="mb-8 text-center">
-			<p class="text-academic-gray-600 text-lg">Collaborative LaTeX editing in your browser</p>
+			<p class="text-gray-700 text-lg font-medium">Collaborative LaTeX editing in your browser</p>
 		</div>
 
-		<div class="bg-academic-paper border-academic-border space-y-6 rounded-lg border p-6 shadow-lg">
+		<div class="space-y-6 rounded-lg bg-white/80 backdrop-blur-sm border border-teal-200 p-6 shadow-xl">
 			<div>
-				<h2 class="text-academic-gray-800 mb-4 text-xl font-semibold">Start a new document</h2>
+				<h2 class="text-gray-800 mb-4 text-xl font-semibold">Start a new document</h2>
 				<div class="space-y-3">
 					<Button
 						on:click={createNewRoom}
 						size="lg"
-						class="bg-academic-primary hover:bg-academic-primary-dark w-full text-white"
+						class="w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white shadow-md transition-all duration-200"
 					>
 						Create New Room
 					</Button>
@@ -174,21 +174,21 @@
 
 						{#if showImportOptions}
 							<div
-								class="absolute top-full right-0 left-0 z-10 mt-2 rounded-lg border border-gray-200 bg-white shadow-lg"
+								class="absolute top-full right-0 left-0 z-10 mt-2 rounded-lg border border-teal-200 bg-white/95 backdrop-blur-sm shadow-lg"
 							>
 								<div class="space-y-1 p-2">
 									<button
 										on:click={handleImportFiles}
-										class="flex w-full items-center rounded px-3 py-2 text-left text-sm hover:bg-gray-100"
+										class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-teal-50 transition-colors"
 									>
-										<Upload size={16} class="mr-2" />
+										<Upload size={16} class="mr-2 text-teal-600" />
 										Import Files (.tex, .bib, etc.)
 									</button>
 									<button
 										on:click={handleImportFolder}
-										class="flex w-full items-center rounded px-3 py-2 text-left text-sm hover:bg-gray-100"
+										class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-teal-50 transition-colors"
 									>
-										<Upload size={16} class="mr-2" />
+										<Upload size={16} class="mr-2 text-teal-600" />
 										Import Folder (entire project)
 									</button>
 								</div>
@@ -203,18 +203,18 @@
 					<div class="w-full border-t border-gray-300"></div>
 				</div>
 				<div class="relative flex justify-center text-sm">
-					<span class="bg-academic-paper text-academic-gray-500 px-2">Or</span>
+					<span class="bg-white/80 text-gray-500 px-2">Or</span>
 				</div>
 			</div>
 
 			<div>
-				<h2 class="text-academic-gray-800 mb-4 text-xl font-semibold">Join existing room</h2>
+				<h2 class="text-gray-800 mb-4 text-xl font-semibold">Join existing room</h2>
 				<form on:submit|preventDefault={joinRoom} class="space-y-4">
 					<input
 						type="text"
 						bind:value={roomId}
 						placeholder="Enter room ID"
-						class="focus:ring-academic-primary w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2"
+						class="w-full rounded-md border border-teal-200 px-4 py-2 focus:border-teal-400 focus:ring-2 focus:ring-teal-200 focus:outline-none transition-colors"
 					/>
 					<Button
 						type="submit"
@@ -229,15 +229,15 @@
 			</div>
 		</div>
 
-		<div class="text-academic-gray-600 mt-8 text-center text-sm">
+		<div class="text-gray-600 mt-8 text-center text-sm">
 			<p>Powered by YJS for real-time collaboration</p>
 			<p class="mt-2">LaTeX compilation happens entirely in your browser</p>
 		</div>
 
 		<div class="mt-6 text-center">
-			<p class="text-academic-gray-600 text-sm">
+			<p class="text-gray-600 text-sm">
 				Want to save your projects?
-				<a href="/demo/lucia/login" class="text-academic-primary font-medium hover:underline">
+				<a href="/demo/lucia/login" class="text-teal-600 font-medium hover:text-teal-700 hover:underline transition-colors">
 					Login / Register
 				</a>
 			</p>
